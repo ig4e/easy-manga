@@ -29,6 +29,7 @@
     "@nestjs/platform-fastify": "^9.0.11",
     "agentkeepalive": "^4.2.1",
     "apollo-server-express": "^3.10.2",
+    "axios": "^0.27.2",
     "cheerio": "1.0.0-rc.12",
     "fastify": "3.17.0",
     "fastify-accepts": "^2.3.0",

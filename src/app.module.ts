@@ -6,8 +6,6 @@ import { ChaptersModule } from './chapters/chapters.module';
 import { SourcesDataModule } from './sources-data/sources-data.module';
 import { MangaReaderService } from './sources-data/manga-reader/manga-reader.service';
 import { MadaraService } from './sources-data/madara/madara.service';
-import { MangaSwatModule } from './sources/manga-swat/manga-swat.module';
-import { MangaSwatService } from './sources/manga-swat/manga-swat.service';
 
 @Module({
   imports: [
@@ -18,8 +16,7 @@ import { MangaSwatService } from './sources/manga-swat/manga-swat.service';
     MangaModule,
     ChaptersModule,
     SourcesDataModule,
-    MangaSwatModule,
   ],
-  providers: [MangaReaderService, MadaraService, MangaSwatService],
+  providers: [MangaReaderService, MadaraService],
 })
 export class AppModule {}
