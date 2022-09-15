@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { MangaDexService } from "../sources/manga-dex/manga-dex.service";
 import {
     MangaReaderService,
     MangaReaderSources,
@@ -13,7 +14,10 @@ import {
 
 @Injectable()
 export class MangaService {
-    constructor(private mangaReader: MangaReaderService) {}
+    constructor(
+        private mangaReader: MangaReaderService,
+        private mangaDex: MangaDexService,
+    ) {}
 
     async search(input: MangaSearchInput) {
         let { mangaReader } = SourcesType;
@@ -28,9 +32,34 @@ export class MangaService {
     async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES }) {
         let { mangaReader } = SourcesType;
         if (mangaReader.includes(input.source)) {
-            return await this.mangaReader.mangaList(
-                input.source as MangaReaderSources,
-                { page: input.page, ...input.filters },
+            return Promise.all(
+                (
+                    await this.mangaReader.mangaList(
+                        input.source as MangaReaderSources,
+                        { page: input.page, ...input.filters },
+                    )
+                ).map(async (manga) => {
+                    let {
+                        aniId,
+                        artist,
+                        author,
+                        cover,
+                        dexId,
+                        muId,
+                        releaseYear,
+                        ok,
+                    } = await this.getDexResult(manga.title);
+                    if (ok) {
+                        manga.dexId = dexId;
+                        manga.aniId = aniId;
+                        manga.muId = muId;
+                        manga.cover = cover;
+                        manga.releaseYear = releaseYear;
+                        if (author?.name) manga.author = author?.name;
+                        if (artist?.name) manga.artist = artist?.name;
+                    }
+                    return manga;
+                }),
             );
         }
     }
@@ -43,7 +72,52 @@ export class MangaService {
                 input.slug,
             );
             if (!manga) throw new NotFoundException();
+
+            let { aniId, artist, author, cover, dexId, muId, releaseYear, ok } =
+                await this.getDexResult(manga.title);
+            if (ok) {
+                manga.dexId = dexId;
+                manga.aniId = aniId;
+                manga.muId = muId;
+                manga.cover = cover;
+                manga.releaseYear = releaseYear;
+                manga.author = author.name;
+                manga.artist = artist.name;
+            }
+
             return manga;
         }
+    }
+
+    async getDexResult(query: string) {
+        let dexResult: any = await this.mangaDex.search(query);
+        if (dexResult) {
+            let image =
+                `https://uploads.mangadex.org/covers/` +
+                dexResult.id +
+                `/` +
+                dexResult.relationships.find(
+                    (relation) => relation.type === "cover_art",
+                ).attributes.fileName;
+
+            let author = dexResult.relationships.find(
+                (relation) => relation.type === "author",
+            )?.attributes;
+
+            let artist = dexResult.relationships.find(
+                (relation) => relation.type === "artist",
+            )?.attributes;
+
+            return {
+                dexId: dexResult.id,
+                aniId: dexResult?.attributes?.links?.al,
+                muId: dexResult?.attributes?.links?.mu,
+                cover: image,
+                releaseYear: dexResult?.attributes?.year,
+                author: author?.name,
+                artist: artist?.name,
+                ok: true,
+            };
+        } else return { ok: false };
     }
 }

@@ -7,7 +7,6 @@ import { SourcesDataModule } from "./sources/sources-data.module";
 import { MangaReaderService } from "./sources/manga-reader/manga-reader.service";
 import { MadaraService } from "./sources/madara/madara.service";
 import { GenresModule } from "./genres/genres.module";
-import { MangaDexModule } from './sources/manga-dex/manga-dex.module';
 
 @Module({
     imports: [
@@ -20,7 +19,6 @@ import { MangaDexModule } from './sources/manga-dex/manga-dex.module';
         ChaptersModule,
         SourcesDataModule,
         GenresModule,
-        MangaDexModule,
     ],
     providers: [MangaReaderService, MadaraService],
 })

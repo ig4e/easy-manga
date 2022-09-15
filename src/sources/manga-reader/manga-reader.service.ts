@@ -4,7 +4,7 @@ import { load } from "cheerio/lib/slim";
 import * as urlHandle from "url-query-handle";
 import { Manga } from "src/manga/entities/manga.entity";
 import { Chapter } from "src/chapters/entities/chapter.entity";
-import * as _eval from "eval";
+import _eval from "eval";
 import { MangaListFilters } from "src/manga/dto/manga.input";
 import { Genre } from "src/genres/entities/genre.entity";
 const UA =
@@ -170,12 +170,17 @@ export class MangaReaderService {
                     slug,
                     url,
                     title,
-                    cover: $$(`img.wp-post-image`).attr("src"),
+                    cover: this.genereateImageUrl(
+                        $$(`img.wp-post-image`).attr("src"),
+                        SOURCE.url,
+                    ),
                     altTitles: [],
                     genres: [],
                     score: Number($$(`div.numscore`).text()?.trim()) ?? 0,
                     chapters: [
                         {
+                            slug: "",
+                            url: "",
                             mangaSlug: slug,
                             name: chapterName,
                             number: chapterNumber,
@@ -212,12 +217,15 @@ export class MangaReaderService {
                         .text()
                         ?.split(/(\,|\|) /g)
                         .filter((title) => title.length > 1) || [],
-                cover: $(mangaSelectors.cover).attr("src"),
+                cover: this.genereateImageUrl(
+                    $(mangaSelectors.cover).attr("src"),
+                    SOURCE.url,
+                ),
                 status: $(mangaSelectors.status).text(),
                 type: $(mangaSelectors.type).text(),
                 author: $(mangaSelectors.author).text(),
                 artist: $(mangaSelectors.artist).text(),
-                releasedAt: new Date(),
+                releaseYear: new Date().getFullYear(),
                 synopsis: $(mangaSelectors.synopsis).text(),
                 score: Number($(mangaSelectors.score).text()),
                 genres: [],
@@ -283,14 +291,17 @@ export class MangaReaderService {
 
             chapter.prevSlug = this.getChapterSlug(source, chapterData.prevUrl);
             chapter.nextSlug = this.getChapterSlug(source, chapterData.nextUrl);
-            chapter.pages = chapterData.sources[0].images?.map(
-                (img) =>
-                    `https://api.emanga.tk/workers/fetch?url=${img}&referer=${SOURCE.url}`,
+            chapter.pages = chapterData.sources[0].images?.map((img) =>
+                this.genereateImageUrl(img, SOURCE.url),
             );
 
             return chapter;
         } else {
         }
+    }
+
+    genereateImageUrl(url: string, referer: string) {
+        return `https://workers.emanga.tk/fetch?url=${url}&referer=${referer}`;
     }
 
     async getSoruceGenres(source: MangaReaderSources) {

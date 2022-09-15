@@ -28,6 +28,7 @@ specifiers:
   express: 4.17.1
   fastify: 3.17.0
   fastify-accepts: ^2.3.0
+  fuse.js: ^6.6.2
   got-scraping: ^3.2.10
   graphql: ^16.6.0
   jest: 28.1.2
@@ -63,6 +64,7 @@ dependencies:
   express: 4.17.1
   fastify: 3.17.0
   fastify-accepts: 2.3.0
+  fuse.js: 6.6.2
   got-scraping: 3.2.10
   graphql: 16.6.0
   js-beautify: 1.14.6
@@ -3892,6 +3894,11 @@ packages:
   /functional-red-black-tree/1.0.1:
     resolution: {integrity: sha512-dsKNQNdj6xA3T+QlADDA7mOSlX0qiMINjn0cgr+eGHGsbSHzTabcIogz2+p/iqP1Xs6EP/sS2SbqH+brGTbq0g==}
     dev: true
+
+  /fuse.js/6.6.2:
+    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /generative-bayesian-network/2.0.7:
     resolution: {integrity: sha512-MQyQ+F9/QMXHZhLRi0Qv6DhFJFu/DWrwrRxuZVn/W5BT38op04lYM1+ii4ya2D8DQa+9Fvmxa9RTdO1ndTlUUw==}
