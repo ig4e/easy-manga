@@ -340,7 +340,7 @@ export class MangaReaderService {
     }
     getChapterSlug(source: MangaReaderSources, url: string) {
         const SOURCE = SOURCES[source];
-        return url.replace(SOURCE.url, "");
+        return url.replace(SOURCE.url + "/", "");
     }
 
     async get(options: OptionsOfTextResponseBody) {
