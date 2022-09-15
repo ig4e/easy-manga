@@ -33,6 +33,7 @@
     "axios": "^0.27.2",
     "cheerio": "1.0.0-rc.12",
     "eval": "^0.1.8",
+    "express": "4.17.1",
     "fastify": "3.17.0",
     "fastify-accepts": "^2.3.0",
     "got-scraping": "^3.2.10",
@@ -42,7 +43,6 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "safe-eval": "^0.4.1",
     "url-query-handle": "^1.0.9",
     "webpack": "5.0.0"
   },
