@@ -6,6 +6,7 @@ import { ChaptersModule } from './chapters/chapters.module';
 import { SourcesDataModule } from './sources-data/sources-data.module';
 import { MangaReaderService } from './sources-data/manga-reader/manga-reader.service';
 import { MadaraService } from './sources-data/madara/madara.service';
+import { GenresModule } from './genres/genres.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MadaraService } from './sources-data/madara/madara.service';
     MangaModule,
     ChaptersModule,
     SourcesDataModule,
+    GenresModule,
   ],
   providers: [MangaReaderService, MadaraService],
 })

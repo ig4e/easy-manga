@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
+import { MangaListFilters } from '../manga/dto/manga.input';
 import {
-  MangaListDto,
   MangaReaderService,
 } from './manga-reader/manga-reader.service';
 
@@ -18,7 +18,7 @@ export class SourcesDataController {
   @Get('/manga-list')
   async mangaList(
     @Query('source') source: 'ARES' | 'FLAMESCANS' | 'MANGASWAT' | 'OZULSCANS',
-    @Query() filters: MangaListDto,
+    @Query() filters: MangaListFilters,
   ) {
     return this.mangaReader.mangaList(source, filters);
   }

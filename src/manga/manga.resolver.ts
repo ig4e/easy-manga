@@ -1,17 +1,31 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { MangaService } from './manga.service';
-import { Manga } from './entities/manga.entity';
-import { MangaUniqueInput } from './dto/manga.input';
+import { Resolver, Query, Args } from "@nestjs/graphql";
+import { MangaService } from "./manga.service";
+import { Manga } from "./entities/manga.entity";
+import {
+    MangalistInput,
+    MangaSearchInput,
+    MangaUniqueInput,
+} from "./dto/manga.input";
 
 @Resolver(() => Manga)
 export class MangaResolver {
-  constructor(private readonly mangaService: MangaService) {}
+    constructor(private readonly mangaService: MangaService) {}
 
-  @Query(() => Manga, { name: 'manga' })
-  findOne(@Args('mangaUniqueInput') mangaUniqueInput: MangaUniqueInput) {
+    @Query(() => [Manga], { name: "search" })
+    search(@Args("searchInput") searchInput: MangaSearchInput) {
+        return this.mangaService.search(searchInput);
+    }
 
-  }
+    @Query(() => Manga, { name: "manga" })
+    findOne(@Args("mangaUniqueInput") mangaUniqueInput: MangaUniqueInput) {
+        return this.mangaService.manga(mangaUniqueInput);
+    }
 
-  @Query(() => [Manga], { name: 'mangaList' })
-  findAll() {}
+    @Query(() => [Manga], { name: "mangaList" })
+    findAll(
+        @Args("mangaListInput", { nullable: true })
+        mangaListInput: MangalistInput,
+    ) {
+        return this.mangaService.mangaList(mangaListInput);
+    }
 }
