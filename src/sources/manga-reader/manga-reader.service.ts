@@ -330,22 +330,17 @@ export class MangaReaderService {
 
     getMangaSlug(source: MangaReaderSources, url: string) {
         const SOURCE = SOURCES[source];
-        return url
-            .replace(SOURCE.url + SOURCE.pathes.manga + "/", "")
-            .replace(/\//g, "");
+        return url.replace(SOURCE.url + SOURCE.pathes.manga + "/", "");
     }
 
     getChapterNumber(name: string) {
         return Number(
-            name
-                .match(/[0-9]+(\.[0-9])?/g)?.[0]
-                ?.replace(/\_/g, ".")
-                ?.replace(/\-/g, "."),
+            name.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
         );
     }
     getChapterSlug(source: MangaReaderSources, url: string) {
         const SOURCE = SOURCES[source];
-        return url.replace(SOURCE.url, "").replace(/\//g, "");
+        return url.replace(SOURCE.url, "");
     }
 
     async get(options: OptionsOfTextResponseBody) {
