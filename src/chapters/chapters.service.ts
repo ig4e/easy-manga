@@ -3,7 +3,7 @@ import { SourcesType } from "../manga/dto/manga.input";
 import {
     MangaReaderService,
     MangaReaderSources,
-} from "../sources-data/manga-reader/manga-reader.service";
+} from "../sources/manga-reader/manga-reader.service";
 import { ChapterUniqueInput } from "./dto/chapter.input";
 
 @Injectable()

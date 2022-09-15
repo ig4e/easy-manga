@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import {
     MangaReaderService,
     MangaReaderSources,
-} from "../sources-data/manga-reader/manga-reader.service";
+} from "../sources/manga-reader/manga-reader.service";
 import {
     MangalistInput,
     MangaSearchInput,

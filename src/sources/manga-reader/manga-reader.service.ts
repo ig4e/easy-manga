@@ -306,7 +306,6 @@ export class MangaReaderService {
             $(SOURCE.selectors.mangaList.dropdown.genre).each((i, el) => {
                 const $$ = load(el);
                 const id = $$(`input`).attr("value");
-                console.log(id)
                 const genre: Genre = {
                     id: Number(id),
                     name: $$(`label`).text()?.trim(),

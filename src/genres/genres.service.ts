@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { MangaReaderService } from "../sources-data/manga-reader/manga-reader.service";
+import { MangaReaderService } from "../sources/manga-reader/manga-reader.service";
 import { BaseInput, SourcesType } from "../manga/dto/manga.input";
 
 @Injectable()

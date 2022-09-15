@@ -3,10 +3,11 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { MangaModule } from "./manga/manga.module";
 import { ChaptersModule } from "./chapters/chapters.module";
-import { SourcesDataModule } from "./sources-data/sources-data.module";
-import { MangaReaderService } from "./sources-data/manga-reader/manga-reader.service";
-import { MadaraService } from "./sources-data/madara/madara.service";
+import { SourcesDataModule } from "./sources/sources-data.module";
+import { MangaReaderService } from "./sources/manga-reader/manga-reader.service";
+import { MadaraService } from "./sources/madara/madara.service";
 import { GenresModule } from "./genres/genres.module";
+import { MangaDexModule } from './sources/manga-dex/manga-dex.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { GenresModule } from "./genres/genres.module";
         ChaptersModule,
         SourcesDataModule,
         GenresModule,
+        MangaDexModule,
     ],
     providers: [MangaReaderService, MadaraService],
 })
