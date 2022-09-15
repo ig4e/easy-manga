@@ -28,6 +28,7 @@ export class MangaListFilters {
     type?: Type;
     @Field(() => Order, { nullable: true })
     order?: Order;
+    page?: number;
 }
 
 export enum Status {

@@ -25,12 +25,12 @@ export class MangaService {
         }
     }
 
-    async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES}) {
+    async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES }) {
         let { mangaReader } = SourcesType;
         if (mangaReader.includes(input.source)) {
             return await this.mangaReader.mangaList(
                 input.source as MangaReaderSources,
-                input.filters,
+                { page: input.page, ...input.filters },
             );
         }
     }
