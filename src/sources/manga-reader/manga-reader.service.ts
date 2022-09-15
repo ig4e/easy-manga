@@ -285,7 +285,7 @@ export class MangaReaderService {
             chapter.nextSlug = this.getChapterSlug(source, chapterData.nextUrl);
             chapter.pages = chapterData.sources[0].images?.map(
                 (img) =>
-                    `https://cdn.mangasekai.ml/fetch?url=${img}&referer=${SOURCE.url}`,
+                    `https://api.emanga.tk/workers/fetch?url=${img}&referer=${SOURCE.url}`,
             );
 
             return chapter;
