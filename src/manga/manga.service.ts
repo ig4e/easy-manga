@@ -53,7 +53,10 @@ export class MangaService {
                         manga.dexId = dexId;
                         manga.aniId = aniId;
                         manga.muId = muId;
-                        manga.cover = cover;
+                        manga.cover = this.mangaReader.genereateImageUrl(
+                            cover,
+                            "mangadex.org",
+                        );
                         manga.releaseYear = releaseYear;
                         if (author?.name) manga.author = author?.name;
                         if (artist?.name) manga.artist = artist?.name;
@@ -79,7 +82,10 @@ export class MangaService {
                 manga.dexId = dexId;
                 manga.aniId = aniId;
                 manga.muId = muId;
-                manga.cover = cover;
+                manga.cover = this.mangaReader.genereateImageUrl(
+                    cover,
+                    "mangadex.org",
+                );
                 manga.releaseYear = releaseYear;
                 manga.author = author.name;
                 manga.artist = artist.name;
