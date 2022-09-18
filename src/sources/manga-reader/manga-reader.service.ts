@@ -336,8 +336,9 @@ export class MangaReaderService {
     getChapterNumber(name: string) {
         return Number(
             name.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
-        );
+        ) || 0;
     }
+
     getChapterSlug(source: MangaReaderSources, url: string) {
         const SOURCE = SOURCES[source];
         return url.replace(SOURCE.url + "/", "");
