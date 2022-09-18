@@ -133,6 +133,7 @@ export class MangaReaderService {
                         source: source as any,
                     },
                 ],
+                source: source as any,
             };
             return manga;
         });
@@ -187,6 +188,7 @@ export class MangaReaderService {
                             source: source as any,
                         },
                     ],
+                    source: source as any,
                 });
             });
         } else {
@@ -230,6 +232,7 @@ export class MangaReaderService {
                 score: Number($(mangaSelectors.score).text()),
                 genres: [],
                 chapters: [],
+                source: source as any,
             };
 
             $(mangaSelectors.chapter.list).each((i, el) => {
@@ -334,9 +337,11 @@ export class MangaReaderService {
     }
 
     getChapterNumber(name: string) {
-        return Number(
-            name.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
-        ) || 0;
+        return (
+            Number(
+                name.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
+            ) || 0
+        );
     }
 
     getChapterSlug(source: MangaReaderSources, url: string) {

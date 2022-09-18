@@ -1,5 +1,6 @@
 import { ObjectType, Field, Int, Float } from "@nestjs/graphql";
 import { Chapter } from "../../chapters/entities/chapter.entity";
+import { Sources } from "../dto/manga.input";
 
 @ObjectType()
 export class Manga {
@@ -37,4 +38,6 @@ export class Manga {
     score?: number;
     @Field(() => [Chapter], { nullable: true })
     chapters?: Chapter[];
+    @Field((type) => Sources, { defaultValue: "ARES" })
+    source: Sources;
 }
