@@ -20,8 +20,6 @@ import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
                 maxSize: Math.pow(2, 20) * 100,
                 // 5 minutes (in milliseconds)
                 ttl: 300_000,
-                
-
             }),
         }),
         MangaModule,

@@ -20,9 +20,9 @@ export class Manga {
     title: string;
     @Field(() => [String])
     altTitles: string[];
-    @Field(() => [String])
+    @Field(() => [String]) 
     genres: string[];
-    @Field({ nullable: true })
+    @Field({ nullable: true,  })
     synopsis?: string;
     @Field({ nullable: true })
     status?: string;
