@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@apollo/utils.keyvaluecache': ^1.0.1
   '@nestjs/apollo': ^10.0.22
   '@nestjs/cli': ^9.0.0
   '@nestjs/common': ^9.0.0
@@ -18,6 +19,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
   agentkeepalive: ^4.2.1
+  apollo-server-core: ^3.10.2
   apollo-server-express: ^3.10.2
   axios: ^0.27.2
   cheerio: 1.0.0-rc.12
@@ -49,7 +51,8 @@ specifiers:
   webpack: 5.0.0
 
 dependencies:
-  '@nestjs/apollo': 10.0.22_5wzfts5l2vhnmclhwyp4glh5xu
+  '@apollo/utils.keyvaluecache': 1.0.1
+  '@nestjs/apollo': 10.0.22_4qisrso5mpiml2lgxz4wkqxuhq
   '@nestjs/common': 9.0.11_j5hagqx4mwzscud4kyjdvubauy
   '@nestjs/core': 9.0.11_psficsz3mqirqwo2ujbfhdr2aa
   '@nestjs/graphql': 10.0.22_f6a6rfkqcjejnebr6fd23engwq
@@ -57,6 +60,7 @@ dependencies:
   '@nestjs/platform-express': 9.0.11_khr6mt6ojlxbw7bo55fknouh34
   '@nestjs/platform-fastify': 9.0.11_khr6mt6ojlxbw7bo55fknouh34
   agentkeepalive: 4.2.1
+  apollo-server-core: 3.10.2_graphql@16.6.0
   apollo-server-express: 3.10.2_p7hh2zom2mmpwc6saiaaeoh4nq
   axios: 0.27.2
   cheerio: 1.0.0-rc.12
@@ -1144,7 +1148,7 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@nestjs/apollo/10.0.22_5wzfts5l2vhnmclhwyp4glh5xu:
+  /@nestjs/apollo/10.0.22_4qisrso5mpiml2lgxz4wkqxuhq:
     resolution: {integrity: sha512-qAvEJMRRbTPs03frhthAy9XZ7m78ckhR9Zide3/wIMN2zZ/60M6FlamRaKytKAUvVrFtRRn9C17Pj8K2w9aMRg==}
     peerDependencies:
       '@apollo/gateway': ^0.44.1 || ^0.46.0 || ^0.48.0 || ^0.49.0 || ^0.50.0 || ^2.0.0
@@ -1168,6 +1172,7 @@ packages:
       '@nestjs/common': 9.0.11_j5hagqx4mwzscud4kyjdvubauy
       '@nestjs/core': 9.0.11_psficsz3mqirqwo2ujbfhdr2aa
       '@nestjs/graphql': 10.0.22_f6a6rfkqcjejnebr6fd23engwq
+      apollo-server-core: 3.10.2_graphql@16.6.0
       apollo-server-express: 3.10.2_p7hh2zom2mmpwc6saiaaeoh4nq
       graphql: 16.6.0
       iterall: 1.3.0

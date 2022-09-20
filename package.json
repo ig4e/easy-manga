@@ -24,6 +24,7 @@
         "node": "16.x"
     },
     "dependencies": {
+        "@apollo/utils.keyvaluecache": "^1.0.1",
         "@nestjs/apollo": "^10.0.22",
         "@nestjs/common": "^9.0.0",
         "@nestjs/core": "^9.0.0",
@@ -32,6 +33,7 @@
         "@nestjs/platform-express": "^9.0.0",
         "@nestjs/platform-fastify": "^9.0.11",
         "agentkeepalive": "^4.2.1",
+        "apollo-server-core": "^3.10.2",
         "apollo-server-express": "^3.10.2",
         "axios": "^0.27.2",
         "cheerio": "1.0.0-rc.12",
