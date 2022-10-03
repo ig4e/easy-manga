@@ -2,7 +2,7 @@ import { Field, InputType, Int, registerEnumType } from "@nestjs/graphql";
 
 @InputType()
 export class BaseInput {
-    @Field((type) => Sources, { defaultValue: "ARES" })
+    @Field((type) => Sources, { defaultValue: "FLAMESCANS" })
     source: Sources;
 }
 
