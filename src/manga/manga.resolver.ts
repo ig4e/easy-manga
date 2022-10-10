@@ -6,26 +6,32 @@ import {
     MangaSearchInput,
     MangaUniqueInput,
 } from "./dto/manga.input";
+import { CacheControl } from "nestjs-gql-cache-control";
 
 @Resolver(() => Manga)
 export class MangaResolver {
     constructor(private readonly mangaService: MangaService) {}
 
     @Query(() => [Manga], { name: "search" })
-    search(@Args("searchInput") searchInput: MangaSearchInput) {
-        return this.mangaService.search(searchInput);
+    @CacheControl({ maxAge: 10, scope: "PUBLIC" })
+    async search(@Args("searchInput") searchInput: MangaSearchInput) {
+        return await this.mangaService.search(searchInput);
     }
 
     @Query(() => Manga, { name: "manga" })
-    findOne(@Args("mangaUniqueInput") mangaUniqueInput: MangaUniqueInput) {
-        return this.mangaService.manga(mangaUniqueInput);
+    @CacheControl({ maxAge: 10, scope: "PUBLIC" })
+    async findOne(
+        @Args("mangaUniqueInput") mangaUniqueInput: MangaUniqueInput,
+    ) {
+        return await this.mangaService.manga(mangaUniqueInput);
     }
 
     @Query(() => [Manga], { name: "mangaList" })
-    findAll(
+    @CacheControl({ maxAge: 10, scope: "PUBLIC" })
+    async findAll(
         @Args("mangaListInput", { nullable: true })
         mangaListInput: MangalistInput,
     ) {
-        return this.mangaService.mangaList(mangaListInput);
+        return await this.mangaService.mangaList(mangaListInput);
     }
 }

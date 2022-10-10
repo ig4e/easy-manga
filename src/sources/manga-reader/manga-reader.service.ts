@@ -11,6 +11,14 @@ const UA =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
 let cookies = "";
 
+const gotInstance = gotScraping.extend({
+    cache: true,
+    cacheOptions: {
+        shared: true,
+    },
+    dnsCache: true,
+});
+
 const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
     pathes: { manga: "/manga" },
     selectors: {
@@ -101,7 +109,7 @@ export type MangaReaderSources =
 export class MangaReaderService {
     constructor() {}
     async search(source: MangaReaderSources, query: string): Promise<Manga[]> {
-        const { body }: { body: any } = await gotScraping.post(
+        const { body }: { body: any } = await gotInstance.post(
             SOURCES[source].url + `/wp-admin/admin-ajax.php`,
             {
                 headers: {
@@ -350,14 +358,14 @@ export class MangaReaderService {
     }
 
     async get(options: OptionsOfTextResponseBody) {
-        const req = await gotScraping.get({
+        const req = await gotInstance.get({
             ...options,
             headers: { ...options.headers, "user-agent": UA, cookie: cookies },
         });
         if (!req.body.includes("You are being redirected...")) return req;
         let cookie = this.solveSucuri(req.body);
         cookies = cookie;
-        return await gotScraping.get({
+        return await gotInstance.get({
             ...options,
             headers: {
                 ...options.headers,

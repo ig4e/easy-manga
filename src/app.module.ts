@@ -8,6 +8,8 @@ import { MangaReaderService } from "./sources/manga-reader/manga-reader.service"
 import { MadaraService } from "./sources/madara/madara.service";
 import { GenresModule } from "./genres/genres.module";
 import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
+import responseCachePlugin from "apollo-server-plugin-response-cache";
+import { ApolloServerPluginCacheControl } from "apollo-server-core/dist/plugin/cacheControl";
 
 @Module({
     imports: [
@@ -15,12 +17,11 @@ import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
             driver: ApolloDriver,
             autoSchemaFile: true,
             introspection: true,
-            cache: new InMemoryLRUCache({
-                // ~100MiB
-                maxSize: Math.pow(2, 20) * 100,
-                // 5 minutes (in milliseconds)
-                ttl: 300_000,
-            }),
+            cache: "bounded",
+            plugins: [
+                ApolloServerPluginCacheControl({ defaultMaxAge: 10 }), // optional
+                responseCachePlugin(),
+            ],
         }),
         MangaModule,
         ChaptersModule,

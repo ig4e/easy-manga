@@ -96,6 +96,7 @@ export class MangaService {
     }
 
     async getDexResult(query: string) {
+        //return { ok: false };
         let dexResult: any = await this.mangaDex.search(query);
         if (dexResult) {
             let image =
