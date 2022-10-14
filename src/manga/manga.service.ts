@@ -48,6 +48,9 @@ export class MangaService {
                         muId,
                         releaseYear,
                         ok,
+                        year,
+                        originalLanguage,
+                        status,
                     } = await this.getDexResult(manga.title);
                     if (ok) {
                         manga.dexId = dexId;
@@ -57,9 +60,10 @@ export class MangaService {
                             cover,
                             "mangadex.org",
                         );
-                        manga.releaseYear = releaseYear;
-                        if (author?.name) manga.author = author?.name;
-                        if (artist?.name) manga.artist = artist?.name;
+                        if (releaseYear) manga.releaseYear = releaseYear;
+                        if (author) manga.author = author;
+                        if (artist) manga.artist = artist;
+                        if (status) manga.status = status;
                     }
                     return manga;
                 }),
@@ -76,8 +80,19 @@ export class MangaService {
             );
             if (!manga) throw new NotFoundException();
 
-            let { aniId, artist, author, cover, dexId, muId, releaseYear, ok } =
-                await this.getDexResult(manga.title);
+            let {
+                aniId,
+                artist,
+                author,
+                cover,
+                dexId,
+                muId,
+                releaseYear,
+                ok,
+                year,
+                originalLanguage,
+                status,
+            } = await this.getDexResult(manga.title);
             if (ok) {
                 manga.dexId = dexId;
                 manga.aniId = aniId;
@@ -86,9 +101,10 @@ export class MangaService {
                     cover,
                     "mangadex.org",
                 );
-                manga.releaseYear = releaseYear;
-                manga.author = author.name;
-                manga.artist = artist.name;
+                if (releaseYear) manga.releaseYear = releaseYear;
+                if (author) manga.author = author;
+                if (artist) manga.artist = artist;
+                if (status) manga.status = status;
             }
 
             return manga;
@@ -109,11 +125,13 @@ export class MangaService {
 
             let author = dexResult.relationships.find(
                 (relation) => relation.type === "author",
-            )?.attributes;
+            );
 
             let artist = dexResult.relationships.find(
                 (relation) => relation.type === "artist",
-            )?.attributes;
+            );
+
+            console.log(dexResult);
 
             return {
                 dexId: dexResult.id,
@@ -121,8 +139,11 @@ export class MangaService {
                 muId: dexResult?.attributes?.links?.mu,
                 cover: image,
                 releaseYear: dexResult?.attributes?.year,
-                author: author?.name,
-                artist: artist?.name,
+                author: author?.attributes?.name,
+                artist: artist?.attributes?.name,
+                status: dexResult?.attributes?.status,
+                year: dexResult?.attributes?.year,
+                originalLanguage: dexResult?.attributes?.originalLanguage,
                 ok: true,
             };
         } else return { ok: false };
