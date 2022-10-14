@@ -131,7 +131,6 @@ export class MangaService {
                 (relation) => relation.type === "artist",
             );
 
-            console.log(dexResult);
 
             return {
                 dexId: dexResult.id,
