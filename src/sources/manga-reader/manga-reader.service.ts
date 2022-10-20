@@ -109,8 +109,9 @@ export type MangaReaderSources =
 export class MangaReaderService {
     constructor() {}
     async search(source: MangaReaderSources, query: string): Promise<Manga[]> {
+        const SOURCE = SOURCES[source];
         const { body }: { body: any } = await gotInstance.post(
-            SOURCES[source].url + `/wp-admin/admin-ajax.php`,
+            SOURCE.url + `/wp-admin/admin-ajax.php`,
             {
                 headers: {
                     "x-requested-with": "XMLHttpRequest",
@@ -123,13 +124,14 @@ export class MangaReaderService {
             },
         );
         const all = JSON.parse(body).series[0].all;
+
         return all.map((e) => {
             const slug = this.getMangaSlug(source, e.post_link);
             let manga: Manga = {
                 slug,
                 url: e.post_link,
                 title: e.post_title,
-                cover: e.post_image,
+                cover: this.genereateImageUrl(e.post_image, SOURCE.url),
                 altTitles: [],
                 genres: e.post_genres.split(", "),
                 score: 0,
@@ -225,7 +227,7 @@ export class MangaReaderService {
                 altTitles:
                     $(mangaSelectors.altTitles)
                         .text()
-                        ?.split(/(\,|\|) /g)
+                        ?.split(/(\,|\|) ?/g)
                         .filter((title) => title.length > 1) || [],
                 cover: this.genereateImageUrl(
                     $(mangaSelectors.cover).attr("src"),

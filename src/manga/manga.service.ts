@@ -11,6 +11,7 @@ import {
     Sources,
     SourcesType,
 } from "./dto/manga.input";
+import { Manga } from "./entities/manga.entity";
 
 @Injectable()
 export class MangaService {
@@ -22,9 +23,13 @@ export class MangaService {
     async search(input: MangaSearchInput) {
         let { mangaReader } = SourcesType;
         if (mangaReader.includes(input.source)) {
-            return await this.mangaReader.search(
-                input.source as MangaReaderSources,
-                input.query,
+            return await Promise.all(
+                (
+                    await this.mangaReader.search(
+                        input.source as MangaReaderSources,
+                        input.query,
+                    )
+                ).map(this.addDexFields.bind(this)),
             );
         }
     }
@@ -38,35 +43,7 @@ export class MangaService {
                         input.source as MangaReaderSources,
                         { page: input.page, ...input.filters },
                     )
-                ).map(async (manga) => {
-                    let {
-                        aniId,
-                        artist,
-                        author,
-                        cover,
-                        dexId,
-                        muId,
-                        releaseYear,
-                        ok,
-                        year,
-                        originalLanguage,
-                        status,
-                    } = await this.getDexResult(manga.title);
-                    if (ok) {
-                        manga.dexId = dexId;
-                        manga.aniId = aniId;
-                        manga.muId = muId;
-                        manga.cover = this.mangaReader.genereateImageUrl(
-                            cover,
-                            "mangadex.org",
-                        );
-                        if (releaseYear) manga.releaseYear = releaseYear;
-                        if (author) manga.author = author;
-                        if (artist) manga.artist = artist;
-                        if (status) manga.status = status;
-                    }
-                    return manga;
-                }),
+                ).map(this.addDexFields.bind(this)),
             );
         }
     }
@@ -80,34 +57,7 @@ export class MangaService {
             );
             if (!manga) throw new NotFoundException();
 
-            let {
-                aniId,
-                artist,
-                author,
-                cover,
-                dexId,
-                muId,
-                releaseYear,
-                ok,
-                year,
-                originalLanguage,
-                status,
-            } = await this.getDexResult(manga.title);
-            if (ok) {
-                manga.dexId = dexId;
-                manga.aniId = aniId;
-                manga.muId = muId;
-                manga.cover = this.mangaReader.genereateImageUrl(
-                    cover,
-                    "mangadex.org",
-                );
-                if (releaseYear) manga.releaseYear = releaseYear;
-                if (author) manga.author = author;
-                if (artist) manga.artist = artist;
-                if (status) manga.status = status;
-            }
-
-            return manga;
+            return this.addDexFields(manga);
         }
     }
 
@@ -145,5 +95,35 @@ export class MangaService {
                 ok: true,
             };
         } else return { ok: false };
+    }
+
+    async addDexFields(manga: Manga) {
+        let {
+            aniId,
+            artist,
+            author,
+            cover,
+            dexId,
+            muId,
+            releaseYear,
+            ok,
+            year,
+            originalLanguage,
+            status,
+        } = await this.getDexResult(manga.title);
+        if (ok) {
+            manga.dexId = dexId;
+            manga.aniId = aniId;
+            manga.muId = muId;
+            manga.cover = this.mangaReader.genereateImageUrl(
+                cover,
+                "mangadex.org",
+            );
+            if (releaseYear) manga.releaseYear = releaseYear;
+            if (author) manga.author = author;
+            if (artist) manga.artist = artist;
+            if (status) manga.status = status;
+        }
+        return manga;
     }
 }
