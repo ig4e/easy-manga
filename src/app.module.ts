@@ -10,6 +10,7 @@ import { GenresModule } from "./genres/genres.module";
 import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
 import responseCachePlugin from "apollo-server-plugin-response-cache";
 import { ApolloServerPluginCacheControl } from "apollo-server-core/dist/plugin/cacheControl";
+import { AppController } from "./app.controller";
 
 @Module({
     imports: [
@@ -29,5 +30,6 @@ import { ApolloServerPluginCacheControl } from "apollo-server-core/dist/plugin/c
         GenresModule,
     ],
     providers: [MangaReaderService, MadaraService],
+    controllers: [AppController],
 })
 export class AppModule {}
