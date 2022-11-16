@@ -66,10 +66,9 @@ const SOURCES: SourcesSettings = {
         url: "https://ozulscans.com",
         ...DEFAULT_SOURCE_SETTINGS,
     },
-    FLAMESCANS: {
-        url: "https://ar.flamescans.org",
-        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/series" },
-        selectors: { ...DEFAULT_SOURCE_SETTINGS.selectors },
+    GALAXYMANGA: {
+        url: "https://galaxymanga.org",
+        ...DEFAULT_SOURCE_SETTINGS,
     },
     MANGASWAT: {
         url: "https://swatmanga.me",
@@ -101,7 +100,7 @@ const SOURCES: SourcesSettings = {
 
 export type MangaReaderSources =
     | "ARES"
-    | "FLAMESCANS"
+    | "GALAXYMANGA"
     | "MANGASWAT"
     | "OZULSCANS";
 

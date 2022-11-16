@@ -9,7 +9,7 @@ export class SourcesDataController {
   constructor(private mangaReader: MangaReaderService) {}
   @Get('/search')
   async search(
-    @Query('source') source: 'ARES' | 'FLAMESCANS' | 'MANGASWAT' | 'OZULSCANS',
+    @Query('source') source: 'ARES' | 'GALAXYMANGA' | 'MANGASWAT' | 'OZULSCANS',
     @Query('query') query: string,
   ) {
     return this.mangaReader.search(source, query);
@@ -17,7 +17,7 @@ export class SourcesDataController {
 
   @Get('/manga-list')
   async mangaList(
-    @Query('source') source: 'ARES' | 'FLAMESCANS' | 'MANGASWAT' | 'OZULSCANS',
+    @Query('source') source: 'ARES' | 'GALAXYMANGA' | 'MANGASWAT' | 'OZULSCANS',
     @Query() filters: MangaListFilters,
   ) {
     return this.mangaReader.mangaList(source, filters);
@@ -25,7 +25,7 @@ export class SourcesDataController {
 
   @Get('/manga')
   async manga(
-    @Query('source') source: 'ARES' | 'FLAMESCANS' | 'MANGASWAT' | 'OZULSCANS',
+    @Query('source') source: 'ARES' | 'GALAXYMANGA' | 'MANGASWAT' | 'OZULSCANS',
     @Query('slug') slug: string,
   ) {
     return this.mangaReader.manga(source, slug);
@@ -33,7 +33,7 @@ export class SourcesDataController {
 
   @Get('/chapter')
   async chapter(
-    @Query('source') source: 'ARES' | 'FLAMESCANS' | 'MANGASWAT' | 'OZULSCANS',
+    @Query('source') source: 'ARES' | 'GALAXYMANGA' | 'MANGASWAT' | 'OZULSCANS',
     @Query('slug') slug: string,
   ) {
     return this.mangaReader.chapter(source, slug);
