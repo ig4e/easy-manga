@@ -32,6 +32,7 @@ export class MangaResolver {
         @Args("mangaListInput", { nullable: true })
         mangaListInput: MangalistInput,
     ) {
-        return await this.mangaService.mangaList(mangaListInput);
+        const mangaList = await this.mangaService.mangaList(mangaListInput);
+        return mangaList
     }
 }

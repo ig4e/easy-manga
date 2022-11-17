@@ -72,7 +72,7 @@ const SOURCES: SourcesSettings = {
     },
     MANGASWAT: {
         url: "https://swatmanga.me",
-        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes },
+        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/m/manga" },
         selectors: {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
             manga: {
@@ -281,7 +281,11 @@ export class MangaReaderService {
         if (ok) {
             const $ = load(body);
             const name = $(`div.headpost > h1.entry-title`).text();
+
+
             const mangaUrl = $(`div.headpost > div > a`).attr("href");
+
+
 
             const chapter: Chapter = {
                 url,
@@ -341,6 +345,7 @@ export class MangaReaderService {
     }
 
     getMangaSlug(source: MangaReaderSources, url: string) {
+        console.log(url)
         const SOURCE = SOURCES[source];
         return url.replace(SOURCE.url + SOURCE.pathes.manga + "/", "");
     }
