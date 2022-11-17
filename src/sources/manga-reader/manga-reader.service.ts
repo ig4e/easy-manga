@@ -345,7 +345,6 @@ export class MangaReaderService {
     }
 
     getMangaSlug(source: MangaReaderSources, url: string) {
-        console.log(url)
         const SOURCE = SOURCES[source];
         return url.replace(SOURCE.url + SOURCE.pathes.manga + "/", "");
     }
