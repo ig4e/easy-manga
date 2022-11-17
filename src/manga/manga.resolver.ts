@@ -33,6 +33,6 @@ export class MangaResolver {
         mangaListInput: MangalistInput,
     ) {
         const mangaList = await this.mangaService.mangaList(mangaListInput);
-        return mangaList
+        return mangaList;
     }
 }
