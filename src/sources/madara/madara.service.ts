@@ -356,20 +356,20 @@ export class MadaraService {
 
     getMangaSlug(source: MadaraSources, url: string) {
         const SOURCE = SOURCES[source];
-        return url.replace(SOURCE.url + SOURCE.pathes.manga + "/", "");
+        return url?.replace(SOURCE.url + SOURCE.pathes.manga + "/", "");
     }
 
     getChapterNumber(name: string) {
         return (
             Number(
-                name.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
+                name?.match(/[0-9]+(\.[0-9])?/g)?.[0]?.replace(/(\_|\-)/g, "."),
             ) || 0
         );
     }
 
     getChapterSlug(source: MadaraSources, url: string) {
         const SOURCE = SOURCES[source];
-        return url.replace(SOURCE.url + "/", "");
+        return url?.replace(SOURCE.url + "/", "");
     }
 
     async get(options: OptionsOfTextResponseBody) {

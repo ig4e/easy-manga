@@ -112,7 +112,7 @@ export class MangaService {
                 `/` +
                 dexResult.relationships.find(
                     (relation) => relation.type === "cover_art",
-                ).attributes.fileName;
+                )?.attributes?.fileName;
 
             let author = dexResult.relationships.find(
                 (relation) => relation.type === "author",
