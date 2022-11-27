@@ -39,6 +39,7 @@ specifiers:
   moment: ^2.29.4
   nestjs-gql-cache-control: ^0.1.2
   prettier: ^2.3.2
+  qs: ^6.11.0
   reflect-metadata: ^0.1.13
   rimraf: ^3.0.2
   rxjs: ^7.2.0
@@ -77,6 +78,7 @@ dependencies:
   js-beautify: 1.14.6
   moment: 2.29.4
   nestjs-gql-cache-control: 0.1.2_lmv34trvim4anhui25xjo7hk3a
+  qs: 6.11.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 7.5.6
@@ -6216,7 +6218,6 @@ packages:
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
-    dev: true
 
   /qs/6.7.0:
     resolution: {integrity: sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==}

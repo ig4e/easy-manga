@@ -99,36 +99,48 @@ export class MadaraService {
     constructor() {}
     async search(source: MadaraSources, query: string): Promise<Manga[]> {
         const SOURCE = SOURCES[source];
-        const { body }: { body: any } = await gotInstance.post(
-            SOURCE.url + `/wp-admin/admin-ajax.php`,
-            {
-                headers: {
-                    "x-requested-with": "XMLHttpRequest",
-                    "content-type":
-                        "application/x-www-form-urlencoded; charset=UTF-8",
+        try {
+            const { body }: { body: any } = await gotScraping(
+                SOURCE.url + `/wp-admin/admin-ajax.php`,
+                {
+                    method: "POST",
+                    headers: {
+                        "x-requested-with": "XMLHttpRequest",
+                        "content-type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body:
+                        "action=wp-manga-search-manga&title=" +
+                        encodeURIComponent(query),
+                    dnsCache: true,
                 },
-                body:
-                    "action=wp-manga-search-manga&title=" +
-                    encodeURIComponent(query),
-            },
-        );
-        const all = JSON.parse(body).data;
+            );
 
-        return all.map((e) => {
-            const slug = this.getMangaSlug(source, e.url);
-            let manga: Manga = {
-                slug,
-                url: e.url,
-                title: e.title,
-                cover: this.genereateImageUrl(e.post_image || "", SOURCE.url),
-                altTitles: [],
-                genres: [],
-                score: 0,
-                chapters: [],
-                source: source as any,
-            };
-            return manga;
-        });
+            const all = JSON.parse(body).data;
+
+            return all.map((e) => {
+                const slug = this.getMangaSlug(source, e.url);
+                let manga: Manga = {
+                    slug,
+                    url: e.url,
+                    title: e.title,
+                    cover: this.genereateImageUrl(
+                        e.post_image || "",
+                        SOURCE.url,
+                    ),
+                    altTitles: [],
+                    genres: [],
+                    score: 0,
+                    chapters: [],
+                    source: source as any,
+                };
+                return manga;
+            });
+        } catch (err) {
+            console.log(source, err);
+
+            return [];
+        }
     }
 
     async mangaList(source: MadaraSources): Promise<Manga[]> {
