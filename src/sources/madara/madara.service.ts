@@ -118,24 +118,27 @@ export class MadaraService {
 
             const all = JSON.parse(body).data;
 
-            return all.map((e) => {
-                const slug = this.getMangaSlug(source, e.url);
-                let manga: Manga = {
-                    slug,
-                    url: e.url,
-                    title: e.title,
-                    cover: this.genereateImageUrl(
-                        e.post_image || "",
-                        SOURCE.url,
-                    ),
-                    altTitles: [],
-                    genres: [],
-                    score: 0,
-                    chapters: [],
-                    source: source as any,
-                };
-                return manga;
-            });
+            return all
+                .map((e) => {
+                    if (e.error) return null;
+                    const slug = this.getMangaSlug(source, e.url);
+                    let manga: Manga = {
+                        slug,
+                        url: e.url,
+                        title: e.title,
+                        cover: this.genereateImageUrl(
+                            e.post_image || "",
+                            SOURCE.url,
+                        ),
+                        altTitles: [],
+                        genres: [],
+                        score: 0,
+                        chapters: [],
+                        source: source as any,
+                    };
+                    return manga;
+                })
+                .filter((x) => x);
         } catch (err) {
             console.log(source, err);
 
@@ -339,7 +342,9 @@ export class MadaraService {
     }
 
     genereateImageUrl(url: string, referer: string) {
-        return `https://workers.emanga.tk/fetch?url=${url}&referer=${referer}`;
+        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+            url,
+        )}&referer=${encodeURIComponent(referer)}`;
     }
 
     async getSoruceGenres(source: MadaraSources) {

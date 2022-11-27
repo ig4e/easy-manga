@@ -77,12 +77,13 @@ const TEAMX: SourceSettings = {
             $(`ol > li`).each((i, el) => {
                 const $$ = load(el);
                 const url = $$(`a`).attr("href");
-
                 results.push({
                     url,
                     slug: this.utils.getMangaSlug.bind(sourceData)(url),
                     title: $$(`a`).text()?.trim(),
-                    cover: $$(`a > img`).attr("src"),
+                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        $$("a > img").attr("src"),
+                    )}&referer=${encodeURIComponent(url)}`,
                     altTitles: [],
                     genres: [],
                     source: sourceData.source,
@@ -185,7 +186,9 @@ const KISSMANGA: SourceSettings = {
                     url,
                     slug: slug,
                     title: $$(`a`).text()?.trim(),
-                    cover: `https://kissmanga.org/mangaimage/${slug}.jpg`,
+                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        `https://kissmanga.org/mangaimage/${slug}.jpg`,
+                    )}&referer=${encodeURIComponent(url)}`,
                     altTitles: [],
                     genres: [],
                     source: sourceData.source,
@@ -196,7 +199,11 @@ const KISSMANGA: SourceSettings = {
         },
 
         getMangaCover(slug: string) {
-            return clearDupleSlashes(`https://kissmanga.org/mangaimage/${slug}.jpg`);
+            return clearDupleSlashes(
+                `https://kissmanga.org/mangaimage${
+                    slug.startsWith("/") ? slug : "/" + slug
+                }.jpg`,
+            );
         },
 
         getMangaUrl(slug: string, page: number = 1) {
@@ -254,9 +261,12 @@ export class CustomSourceService {
                 url,
                 slug,
                 title: $$(sourceData.selectors.mangaList.title).text().trim(),
-                cover: sourceData.utils.getMangaCover
-                    ? sourceData.utils.getMangaCover(slug)
-                    : $$(sourceData.selectors.mangaList.cover).attr("src"),
+                cover: this.genereateImageUrl(
+                    sourceData.utils.getMangaCover
+                        ? sourceData.utils.getMangaCover(slug)
+                        : $$(sourceData.selectors.mangaList.cover).attr("src"),
+                    url,
+                ),
                 altTitles: [],
                 genres: [],
                 source: sourceData.source,
@@ -286,9 +296,12 @@ export class CustomSourceService {
             url,
             slug,
             title: $(sourceData.selectors.manga.title).text()?.trim(),
-            cover: sourceData.utils.getMangaCover
-                ? sourceData.utils.getMangaCover(slug)
-                : $(sourceData.selectors.manga.cover).attr("src"),
+            cover: this.genereateImageUrl(
+                sourceData.utils.getMangaCover
+                    ? sourceData.utils.getMangaCover(slug)
+                    : $(sourceData.selectors.manga.cover).attr("src"),
+                url,
+            ),
             source: Sources[source],
             author: $(sourceData.selectors.manga.author).text()?.trim(),
             artist: $(sourceData.selectors.manga.artist).text()?.trim(),
@@ -420,7 +433,9 @@ export class CustomSourceService {
     }
 
     genereateImageUrl(url: string, referer: string) {
-        return `https://workers.emanga.tk/fetch?url=${url}&referer=${referer}`;
+        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+            url,
+        )}&referer=${encodeURIComponent(referer)}`;
     }
 }
 

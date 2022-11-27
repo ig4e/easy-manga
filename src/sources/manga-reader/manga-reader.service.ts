@@ -129,28 +129,30 @@ export class MangaReaderService {
         );
         const all = JSON.parse(body).series[0].all;
 
-        return all.map((e) => {
-            const slug = this.getMangaSlug(source, e.post_link);
-            let manga: Manga = {
-                slug,
-                url: e.post_link,
-                title: e.post_title,
-                cover: this.genereateImageUrl(e.post_image, SOURCE.url),
-                altTitles: [],
-                genres: e.post_genres.split(", "),
-                score: 0,
-                chapters: [
-                    {
-                        mangaSlug: slug,
-                        name: e.post_latest,
-                        number: this.getChapterNumber(e.post_latest),
-                        source: source as any,
-                    },
-                ],
-                source: source as any,
-            };
-            return manga;
-        });
+        return all
+            .map((e) => {
+                const slug = this.getMangaSlug(source, e.post_link);
+                let manga: Manga = {
+                    slug,
+                    url: e.post_link,
+                    title: e.post_title,
+                    cover: this.genereateImageUrl(e.post_image, SOURCE.url),
+                    altTitles: [],
+                    genres: e.post_genres.split(", "),
+                    score: 0,
+                    chapters: [
+                        {
+                            mangaSlug: slug,
+                            name: e.post_latest,
+                            number: this.getChapterNumber(e.post_latest),
+                            source: source as any,
+                        },
+                    ],
+                    source: source as any,
+                };
+                return manga;
+            })
+            .filter((x) => x);
     }
 
     async mangaList(
@@ -319,7 +321,9 @@ export class MangaReaderService {
     }
 
     genereateImageUrl(url: string, referer: string) {
-        return `https://workers.emanga.tk/fetch?url=${url}&referer=${referer}`;
+        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+            url,
+        )}&referer=${encodeURIComponent(referer)}`;
     }
 
     async getSoruceGenres(source: MangaReaderSources) {

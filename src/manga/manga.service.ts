@@ -28,12 +28,10 @@ export class MangaService {
         let { mangaReader, madara, custom } = SourcesType;
         if (mangaReader.includes(input.source)) {
             return await Promise.all(
-                (
-                    await this.mangaReader.search(
-                        input.source as MangaReaderSources,
-                        input.query,
-                    )
-                ).map(this.addDexFields.bind(this)),
+                await this.mangaReader.search(
+                    input.source as MangaReaderSources,
+                    input.query,
+                ),
             );
         } else if (madara.includes(input.source)) {
             return await Promise.all(
@@ -46,9 +44,7 @@ export class MangaService {
             );
         } else if (custom.includes(input.source)) {
             return await Promise.all(
-                (
-                    await this.customSource.search(input.source, input.query)
-                ).map(this.addDexFields.bind(this)),
+                await this.customSource.search(input.source, input.query),
             );
         }
     }
