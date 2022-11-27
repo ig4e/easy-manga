@@ -63,9 +63,36 @@ const SOURCES: SourcesSettings = {
         url: "https://mangalek.com",
         ...DEFAULT_SOURCE_SETTINGS,
     },
+    AZORA: {
+        url: "https://azoraworlds.net",
+        ...DEFAULT_SOURCE_SETTINGS,
+        pathes: {
+            manga: "/series",
+        },
+    },
+    MANGASPARK: {
+        url: "https://mangaspark.com",
+        ...DEFAULT_SOURCE_SETTINGS,
+    },
+    STKISSMANGA: {
+        url: "https://1stkissmanga.io",
+        ...DEFAULT_SOURCE_SETTINGS,
+    },
+    MANGAPROTM: {
+        url: "https://mangaprotm.com",
+        ...DEFAULT_SOURCE_SETTINGS,
+        pathes: {
+            manga: "/series",
+        },
+    },
 };
 
-export type MadaraSources = "MANGALEK" | "MANGASPARK" | "AZORA";
+export type MadaraSources =
+    | "MANGALEK"
+    | "MANGASPARK"
+    | "AZORA"
+    | "STKISSMANGA"
+    | "MANGAPROTM";
 
 @Injectable()
 export class MadaraService {
@@ -173,6 +200,7 @@ export class MadaraService {
 
         if (ok) {
             const $ = load(body);
+            const postID = $(`div.post-rating > input`).attr("value");
 
             let mangaInfo: Manga = {
                 slug,
@@ -200,7 +228,26 @@ export class MadaraService {
                 source: source as any,
             };
 
-            $(mangaSelectors.chapter.list).each((i, el) => {
+            $(mangaSelectors.genre).each((i, el) => {
+                const $$ = load(el);
+                mangaInfo.genres.push($$("a").text()?.trim());
+            });
+
+            const { body: chaptersBody } = await gotScraping(
+                `${SOURCE.url}/wp-admin/admin-ajax.php`,
+                {
+                    method: "POST",
+                    headers: {
+                        "content-type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body: `action=manga_get_chapters&manga=${postID}`,
+                },
+            );
+
+            const chapter$ = load(chaptersBody);
+
+            chapter$(mangaSelectors.chapter.list).each((i, el) => {
                 const $$ = load(el);
                 const url = $$(mangaSelectors.chapter.url).attr("href") || "d";
 
@@ -217,11 +264,6 @@ export class MadaraService {
                         ) || this.getChapterNumber(name?.trim()),
                     source: source as any,
                 });
-            });
-
-            $(mangaSelectors.genre).each((i, el) => {
-                const $$ = load(el);
-                mangaInfo.genres.push($$("a").text()?.trim());
             });
 
             return mangaInfo;

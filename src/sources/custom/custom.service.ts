@@ -110,8 +110,118 @@ const TEAMX: SourceSettings = {
     },
 };
 
+const KISSMANGA: SourceSettings = {
+    source: Sources.KISSMANGA,
+    url: "https://kissmanga.org",
+    pathes: { manga: "/manga", mangaList: "/manga_list", chapter: "/chapter" },
+    selectors: {
+        manga: {
+            title: "#leftside > div:nth-child(1) > div.barContent.full > div.full > h2 > strong",
+            altTitles:
+                "#leftside > div:nth-child(1) > div.barContent.full > div.full > p:nth-child(2) > a",
+            cover: "#rightside > div > div.barContent.cover_anime.full > div.a_center > img",
+            status: "#leftside > div:nth-child(1) > div.barContent.full > div.full > div.static_single > p:nth-child(1)",
+            type: "div.whitebox.shadow-sm > div.text-right > div:nth-child(5) > small:nth-child(2) > a",
+            author: "#leftside > div:nth-child(1) > div.barContent.full > div.full > p:nth-child(3) > a",
+            artist: "div.whitebox.shadow-sm > div.text-right > div:nth-child(7) > small:nth-child(2) > a",
+            releasedAt: "",
+            synopsis: `#leftside > div:nth-child(1) > div.barContent.full > div.full > div.summary > p`,
+            score: ``,
+            genre: "#leftside > div:nth-child(1) > div.barContent.full > div.full > p:nth-child(4) > a",
+            chapter: {
+                list: "#leftside > div:nth-child(3) > div.barContent.episodeList.full > div.full > div.listing.listing8515.full > div > div:nth-child(1) > h3 > a",
+                url: "a",
+                number: "a",
+                name: "a",
+            },
+        },
+        mangaList: {
+            list: "#leftside > div:nth-child(2) > div.barContent.full > div.listing.full > div > div > a.item_movies_link",
+            dropdown: {
+                genre: "",
+            },
+            title: "a",
+            cover: "",
+            url: "a",
+            score: "",
+            latestChapterName: "",
+        },
+        chapter: {
+            name: "#selectEpisode > option[selected]",
+            number: `#selectEpisode > option[selected]`,
+            next: "div.btn_next_and_prev > a.nexxt",
+            prev: "div.btn_next_and_prev > a.preev",
+            page: "#centerDivVideo > img",
+            mangaUrl: ``,
+        },
+    },
+    utils: {
+        getMangaSlug(url: string) {
+            return url?.replace(this.url, "")?.replace(this.pathes.manga, "");
+        },
+
+        getChapterSlug(url: string) {
+            return url?.replace(this.url, "")?.replace(this.pathes.chapter, "");
+        },
+
+        async getSearchData(query: string, sourceData: SourceSettings) {
+            const results: Manga[] = [];
+            const url = `https://kissmanga.org/Search/SearchSuggest?keyword=${encodeURIComponent(
+                query,
+            )}`;
+            const { body } = await gotScraping(url, {
+                method: "GET",
+                dnsCache: true,
+            });
+
+            const $ = load(body);
+
+            $(`a.item_search_link`).each((i, el) => {
+                const $$ = load(el);
+                const url = sourceData.url + $$(`a`).attr("href");
+                const slug = this.utils.getMangaSlug.bind(sourceData)(url);
+
+                results.push({
+                    url,
+                    slug: slug,
+                    title: $$(`a`).text()?.trim(),
+                    cover: `https://kissmanga.org/mangaimage/${slug}.jpg`,
+                    altTitles: [],
+                    genres: [],
+                    source: sourceData.source,
+                });
+            });
+
+            return results;
+        },
+
+        getMangaCover(slug: string) {
+            return clearDupleSlashes(`https://kissmanga.org/mangaimage/${slug}.jpg`);
+        },
+
+        getMangaUrl(slug: string, page: number = 1) {
+            return clearDupleSlashes(
+                this.url + this.pathes.manga + `/` + slug + `?page=${page}`,
+            );
+        },
+
+        getMangaListUrl(page: number = 1) {
+            return clearDupleSlashes(
+                this.url + this.pathes.mangaList + `/?page=${page}`,
+            );
+        },
+
+        getChapterUrl(slug: string) {
+            return clearDupleSlashes(
+                this.url + this.pathes.chapter + `/` + slug,
+            );
+        },
+    },
+};
+
 const customSources = {
     TEAMX,
+    KISSMANGA,
 };
 
 @Injectable()
@@ -139,12 +249,14 @@ export class CustomSourceService {
         $(sourceData.selectors.mangaList.list).each((i, el) => {
             const $$ = load(el);
             const url = $$(sourceData.selectors.mangaList.url).attr("href");
-
+            const slug = sourceData.utils.getMangaSlug.bind(sourceData)(url);
             const manga: Manga = {
                 url,
-                slug: sourceData.utils.getMangaSlug.bind(sourceData)(url),
+                slug,
                 title: $$(sourceData.selectors.mangaList.title).text().trim(),
-                cover: $$(sourceData.selectors.mangaList.cover).attr("src"),
+                cover: sourceData.utils.getMangaCover
+                    ? sourceData.utils.getMangaCover(slug)
+                    : $$(sourceData.selectors.mangaList.cover).attr("src"),
                 altTitles: [],
                 genres: [],
                 source: sourceData.source,
@@ -174,7 +286,9 @@ export class CustomSourceService {
             url,
             slug,
             title: $(sourceData.selectors.manga.title).text()?.trim(),
-            cover: $(sourceData.selectors.manga.cover).attr("src"),
+            cover: sourceData.utils.getMangaCover
+                ? sourceData.utils.getMangaCover(slug)
+                : $(sourceData.selectors.manga.cover).attr("src"),
             source: Sources[source],
             author: $(sourceData.selectors.manga.author).text()?.trim(),
             artist: $(sourceData.selectors.manga.artist).text()?.trim(),
@@ -193,7 +307,14 @@ export class CustomSourceService {
 
         $(sourceData.selectors.manga.genre).each((i, el) => {
             const $$ = load(el);
-            mangaDetails.genres.push($$(el).text()?.trim());
+            mangaDetails.genres.push(
+                $$(el)
+                    .text()
+                    ?.trim()
+                    ?.split(" ")
+                    ?.map((x) => x.trim())
+                    .join(" "),
+            );
         });
 
         getChapters($);
@@ -234,7 +355,10 @@ export class CustomSourceService {
                     slug: sourceData.utils.getChapterSlug.bind(sourceData)(url),
                     name: $$(sourceData.selectors.manga.chapter.name)
                         .text()
-                        ?.trim(),
+                        ?.trim()
+                        ?.split(" ")
+                        ?.map((x) => x.trim())
+                        .join(" "),
                     number: getChapterNumber(
                         $$(sourceData.selectors.manga.chapter.number)
                             .text()
@@ -305,6 +429,8 @@ export interface SourceSettings {
     url: string;
     pathes: {
         manga: string;
+        mangaList?: string;
+        chapter?: string;
     };
     utils: {
         [index: string]: Function;

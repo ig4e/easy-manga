@@ -74,9 +74,9 @@ export class MangalistInput extends BaseInput {
 }
 
 export const SourcesType = {
-    mangaReader: ["ARES", "GALAXYMANGA", "MANGASWAT", "OZULSCANS"],
-    madara: ["MANGALEK", "MANGASPARK", "AZORA"],
-    custom: ["MANGAAE", "TEAMX"],
+    mangaReader: ["ARES", "GALAXYMANGA", "MANGASWAT", "OZULSCANS", "ARENASCANS"],
+    madara: ["MANGALEK", "MANGASPARK", "AZORA", "STKISSMANGA", "MANGAPROTM"],
+    custom: ["MANGAAE", "TEAMX", "KISSMANGA"],
 };
 
 export enum Sources {
@@ -89,6 +89,10 @@ export enum Sources {
     MANGAAE = "MANGAAE",
     OZULSCANS = "OZULSCANS",
     TEAMX = "TEAMX",
+    STKISSMANGA = "STKISSMANGA",
+    KISSMANGA = "KISSMANGA",
+    MANGAPROTM = "MANGAPROTM",
+    ARENASCANS = "ARENASCANS"
 }
 
 registerEnumType(Sources, {

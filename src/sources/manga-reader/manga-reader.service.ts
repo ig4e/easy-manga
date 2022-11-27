@@ -58,6 +58,10 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
 };
 
 const SOURCES: SourcesSettings = {
+    ARENASCANS: {
+        url: "https://arenascans.net",
+        ...DEFAULT_SOURCE_SETTINGS,
+    },
     ARES: {
         url: "https://aresmanga.com",
         ...DEFAULT_SOURCE_SETTINGS,
@@ -102,7 +106,8 @@ export type MangaReaderSources =
     | "ARES"
     | "GALAXYMANGA"
     | "MANGASWAT"
-    | "OZULSCANS";
+    | "OZULSCANS"
+    | "ARENASCANS";
 
 @Injectable()
 export class MangaReaderService {
@@ -282,10 +287,7 @@ export class MangaReaderService {
             const $ = load(body);
             const name = $(`div.headpost > h1.entry-title`).text();
 
-
             const mangaUrl = $(`div.headpost > div > a`).attr("href");
-
-
 
             const chapter: Chapter = {
                 url,
