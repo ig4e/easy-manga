@@ -72,7 +72,7 @@ const SOURCES: SourcesSettings = {
     },
     MANGASWAT: {
         url: "https://swatmanga.me",
-        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/m/manga" },
+        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/manga" },
         selectors: {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
             manga: {
