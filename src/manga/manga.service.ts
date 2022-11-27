@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { MadaraService, MadaraSources } from "../sources/madara/madara.service";
 import { MangaDexService } from "../sources/manga-dex/manga-dex.service";
 import {
     MangaReaderService,
@@ -17,11 +18,12 @@ import { Manga } from "./entities/manga.entity";
 export class MangaService {
     constructor(
         private mangaReader: MangaReaderService,
+        private madara: MadaraService,
         private mangaDex: MangaDexService,
     ) {}
 
     async search(input: MangaSearchInput) {
-        let { mangaReader } = SourcesType;
+        let { mangaReader, madara } = SourcesType;
         if (mangaReader.includes(input.source)) {
             return await Promise.all(
                 (
@@ -31,11 +33,20 @@ export class MangaService {
                     )
                 ).map(this.addDexFields.bind(this)),
             );
+        } else if (madara.includes(input.source)) {
+            return await Promise.all(
+                (
+                    await this.madara.search(
+                        input.source as MadaraSources,
+                        input.query,
+                    )
+                ).map(this.addDexFields.bind(this)),
+            );
         }
     }
 
     async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES }) {
-        let { mangaReader } = SourcesType;
+        let { mangaReader, madara } = SourcesType;
         if (mangaReader.includes(input.source)) {
             return Promise.all(
                 (
@@ -45,17 +56,30 @@ export class MangaService {
                     )
                 ).map(this.addDexFields.bind(this)),
             );
+        } else if (madara.includes(input.source)) {
+            return Promise.all(
+                (
+                    await this.madara.mangaList(input.source as MadaraSources)
+                ).map(this.addDexFields.bind(this)),
+            );
         }
     }
 
     async manga(input: MangaUniqueInput) {
-        let { mangaReader } = SourcesType;
+        let { mangaReader, madara } = SourcesType;
         if (mangaReader.includes(input.source)) {
             let manga = await this.mangaReader.manga(
                 input.source as MangaReaderSources,
                 input.slug,
             );
             if (!manga) throw new NotFoundException();
+
+            return this.addDexFields(manga);
+        } else if (madara.includes(input.source)) {
+            let manga = await this.madara.manga(
+                input.source as MadaraSources,
+                input.slug,
+            );
 
             return this.addDexFields(manga);
         }
