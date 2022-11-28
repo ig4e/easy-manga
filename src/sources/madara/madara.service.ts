@@ -16,7 +16,6 @@ const gotInstance = gotScraping.extend({
     cacheOptions: {
         shared: true,
     },
-    dnsCache: true,
 });
 
 const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
@@ -75,7 +74,7 @@ const SOURCES: SourcesSettings = {
         ...DEFAULT_SOURCE_SETTINGS,
     },
     STKISSMANGA: {
-        url: "https://1stkissmanga.io",
+        url: "https://1stkissmanga.love",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     MANGAPROTM: {
@@ -112,7 +111,6 @@ export class MadaraService {
                     body:
                         "action=wp-manga-search-manga&title=" +
                         encodeURIComponent(query),
-                    dnsCache: true,
                 },
             );
 
@@ -153,7 +151,6 @@ export class MadaraService {
 
         const { body, ok, statusCode, statusMessage } = await this.get({
             url,
-            dnsCache: true,
         });
 
         if (ok) {
@@ -210,7 +207,6 @@ export class MadaraService {
         const url = SOURCE.url + SOURCE.pathes.manga + `/${slug}`;
         const { body, ok } = await this.get({
             url,
-            dnsCache: true,
         });
 
         if (ok) {
@@ -290,7 +286,6 @@ export class MadaraService {
         const url = SOURCE.url + `/${slug}`;
         const { body, ok } = await this.get({
             url,
-            dnsCache: true,
         });
 
         if (ok) {
@@ -351,7 +346,6 @@ export class MadaraService {
         const SOURCE = SOURCES[source];
         const { body, ok } = await this.get({
             url: SOURCE.url + SOURCE.pathes.manga,
-            dnsCache: true,
         });
         const genres: Genre[] = [];
 

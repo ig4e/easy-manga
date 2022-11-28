@@ -201,7 +201,7 @@ const KISSMANGA: SourceSettings = {
         getMangaCover(slug: string) {
             return clearDupleSlashes(
                 `https://kissmanga.org/mangaimage${
-                    slug.startsWith("/") ? slug : "/" + slug
+                    slug?.startsWith("/") ? slug : "/" + slug
                 }.jpg`,
             );
         },
