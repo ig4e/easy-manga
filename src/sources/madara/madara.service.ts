@@ -35,7 +35,7 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
             title: "div.post-title > h1",
             altTitles:
                 "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(4) > div.summary-content",
-            cover: "div.tab-summary > div.summary_image > a > img",
+            cover: "div.summary_image > a > img",
             status: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-status > div:nth-child(2) > div.summary-content",
             type: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(8) > div.summary-content",
             author: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(5) > div.summary-content > div > a",
@@ -224,7 +224,8 @@ export class MadaraService {
                         .filter((title) => title.length > 1)
                         ?.map((x) => x.trim()) || [],
                 cover: this.genereateImageUrl(
-                    $(mangaSelectors.cover).attr("src"),
+                    $(mangaSelectors.cover).attr("srcset") ||
+                        $(mangaSelectors.cover).attr("src"),
                     SOURCE.url,
                 ),
                 status: $(mangaSelectors.status).text()?.trim(),
@@ -261,8 +262,6 @@ export class MadaraService {
             chapter$(mangaSelectors.chapter.list).each((i, el) => {
                 const $$ = load(el);
                 const url = $$(mangaSelectors.chapter.url).attr("href") || "d";
-
-                console.log(url);
                 const name = $$(mangaSelectors.chapter.name).text()?.trim();
                 mangaInfo.chapters.push({
                     slug: this.getChapterSlug(source, url)?.trim(),
