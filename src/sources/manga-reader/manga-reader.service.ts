@@ -73,6 +73,13 @@ const SOURCES: SourcesSettings = {
     GALAXYMANGA: {
         url: "https://galaxymanga.org",
         ...DEFAULT_SOURCE_SETTINGS,
+        selectors: {
+            ...DEFAULT_SOURCE_SETTINGS.selectors,
+            manga: {
+                ...DEFAULT_SOURCE_SETTINGS.selectors.manga,
+                synopsis: `div.entry-content.entry-content-single > blockquote > p`
+            }
+        }
     },
     MANGASWAT: {
         url: "https://swatmanga.me",
