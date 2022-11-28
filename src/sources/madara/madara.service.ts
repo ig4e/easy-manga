@@ -34,15 +34,15 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
         manga: {
             title: "div.post-title > h1",
             altTitles:
-                "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(4) > div.summary-content",
+                "div.post-content > div:nth-child(4) > div.summary-content",
             cover: "div.summary_image > a > img",
-            status: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-status > div:nth-child(2) > div.summary-content",
-            type: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(8) > div.summary-content",
-            author: "body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(5) > div.summary-content > div > a",
-            artist: `body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div:nth-child(6) > div.summary-content > div > a`,
+            status: "div.post-status > div:nth-child(2) > div.summary-content",
+            type: "div.post-content > div:nth-child(8) > div.summary-content",
+            author: "div.post-content > div:nth-child(5) > div.summary-content > div > a",
+            artist: `div.post-content > div:nth-child(6) > div.summary-content > div > a`,
             releasedAt: "",
-            synopsis: `#tw-target-text > span`,
-            score: `body > div.wrap > div > div > div > div.profile-manga > div > div > div > div.tab-summary > div.summary_content_wrap > div > div.post-content > div.post-rating > div.post-total-rating > span`,
+            synopsis: `div.description-summary`,
+            score: `div.post-content > div.post-rating > div.post-total-rating > span`,
             genre: "div.summary-content > div.genres-content > a",
             chapter: {
                 list: "div.page-content-listing.single-page > div > ul > li",
