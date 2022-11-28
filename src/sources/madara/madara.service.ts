@@ -27,6 +27,7 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
                 genre: "div.filter.dropdown > ul.genrez > li",
             },
             cover: "img.wp-post-image",
+            coverAttr: "src",
             url: "div.bsx > a",
             score: "div.numscore",
             latestChapterName: "div.adds > div.epxs",
@@ -36,6 +37,7 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
             altTitles:
                 "div.post-content > div:nth-child(4) > div.summary-content",
             cover: "div.summary_image > a > img",
+            coverAttr: "src",
             status: "div.post-status > div:nth-child(2) > div.summary-content",
             type: "div.post-content > div:nth-child(8) > div.summary-content",
             author: "div.post-content > div:nth-child(5) > div.summary-content > div > a",
@@ -76,6 +78,17 @@ const SOURCES: SourcesSettings = {
     STKISSMANGA: {
         url: "https://1stkissmanga.love",
         ...DEFAULT_SOURCE_SETTINGS,
+        selectors: {
+            ...DEFAULT_SOURCE_SETTINGS.selectors,
+            manga: {
+                ...DEFAULT_SOURCE_SETTINGS.selectors.manga,
+                coverAttr: "data-lazy-src",
+            },
+            mangaList: {
+                ...DEFAULT_SOURCE_SETTINGS.selectors.mangaList,
+                coverAttr: "data-lazy-src",
+            },
+        },
     },
     MANGAPROTM: {
         url: "https://mangaprotm.com",
@@ -144,10 +157,10 @@ export class MadaraService {
         }
     }
 
-    async mangaList(source: MadaraSources): Promise<Manga[]> {
+    async mangaList(source: MadaraSources, page: number = 1): Promise<Manga[]> {
         const SOURCE = SOURCES[source];
         const results: Manga[] = [];
-        const url = SOURCE.url + SOURCE.pathes.manga;
+        const url = SOURCE.url + SOURCE.pathes.manga + "/page/" + page;
 
         const { body, ok, statusCode, statusMessage } = await this.get({
             url,
@@ -175,7 +188,9 @@ export class MadaraService {
                     url,
                     title,
                     cover: this.genereateImageUrl(
-                        $$(`a > img`).attr("src"),
+                        $$(`a > img`).attr(
+                            SOURCE.selectors.mangaList.coverAttr,
+                        ),
                         SOURCE.url,
                     ),
                     altTitles: [],
@@ -224,8 +239,7 @@ export class MadaraService {
                         .filter((title) => title.length > 1)
                         ?.map((x) => x.trim()) || [],
                 cover: this.genereateImageUrl(
-                    $(mangaSelectors.cover).attr("srcset") ||
-                        $(mangaSelectors.cover).attr("src"),
+                    $(mangaSelectors.cover).attr(mangaSelectors.coverAttr),
                     SOURCE.url,
                 ),
                 status: $(mangaSelectors.status).text()?.trim(),
@@ -432,6 +446,7 @@ export interface SourceSettings {
         mangaList: {
             list: string;
             cover: string;
+            coverAttr: string;
             url: string;
             score: string;
             dropdown: {
@@ -443,6 +458,7 @@ export interface SourceSettings {
             title: string;
             altTitles: string;
             cover: string;
+            coverAttr: string;
             status: string;
             type: string;
             author: string;
