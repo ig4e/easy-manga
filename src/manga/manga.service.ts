@@ -63,14 +63,17 @@ export class MangaService {
         } else if (madara.includes(input.source)) {
             return Promise.all(
                 (
-                    await this.madara.mangaList(input.source as MadaraSources, input.page)
+                    await this.madara.mangaList(
+                        input.source as MadaraSources,
+                        input.page,
+                    )
                 ).map(this.addDexFields.bind(this)),
             );
         } else if (custom.includes(input.source)) {
             return Promise.all(
-                (await this.customSource.mangaList(input.source, input.page)).map(
-                    this.addDexFields.bind(this),
-                ),
+                (
+                    await this.customSource.mangaList(input.source, input.page)
+                ).map(this.addDexFields.bind(this)),
             );
         }
     }

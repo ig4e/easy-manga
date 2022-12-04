@@ -77,9 +77,9 @@ const SOURCES: SourcesSettings = {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
             manga: {
                 ...DEFAULT_SOURCE_SETTINGS.selectors.manga,
-                synopsis: `div.entry-content.entry-content-single > blockquote > p`
-            }
-        }
+                synopsis: `div.entry-content.entry-content-single > blockquote > p`,
+            },
+        },
     },
     MANGASWAT: {
         url: "https://swatmanga.me",
@@ -120,46 +120,50 @@ export type MangaReaderSources =
 export class MangaReaderService {
     constructor() {}
     async search(source: MangaReaderSources, query: string): Promise<Manga[]> {
-        const SOURCE = SOURCES[source];
-        const { body }: { body: any } = await gotInstance.post(
-            SOURCE.url + `/wp-admin/admin-ajax.php`,
-            {
-                headers: {
-                    "x-requested-with": "XMLHttpRequest",
-                    "content-type":
-                        "application/x-www-form-urlencoded; charset=UTF-8",
+        try {
+            const SOURCE = SOURCES[source];
+            const { body }: { body: any } = await gotInstance.post(
+                SOURCE.url + `/wp-admin/admin-ajax.php`,
+                {
+                    headers: {
+                        "x-requested-with": "XMLHttpRequest",
+                        "content-type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body:
+                        "action=ts_ac_do_search&ts_ac_query=" +
+                        encodeURIComponent(query),
                 },
-                body:
-                    "action=ts_ac_do_search&ts_ac_query=" +
-                    encodeURIComponent(query),
-            },
-        );
-        const all = JSON.parse(body).series[0].all;
+            );
+            const all = JSON.parse(body).series[0].all;
 
-        return all
-            .map((e) => {
-                const slug = this.getMangaSlug(source, e.post_link);
-                let manga: Manga = {
-                    slug,
-                    url: e.post_link,
-                    title: e.post_title,
-                    cover: this.genereateImageUrl(e.post_image, SOURCE.url),
-                    altTitles: [],
-                    genres: e.post_genres.split(", "),
-                    score: 0,
-                    chapters: [
-                        {
-                            mangaSlug: slug,
-                            name: e.post_latest,
-                            number: this.getChapterNumber(e.post_latest),
-                            source: source as any,
-                        },
-                    ],
-                    source: source as any,
-                };
-                return manga;
-            })
-            .filter((x) => x);
+            return all
+                .map((e) => {
+                    const slug = this.getMangaSlug(source, e.post_link);
+                    let manga: Manga = {
+                        slug,
+                        url: e.post_link,
+                        title: e.post_title,
+                        cover: this.genereateImageUrl(e.post_image, SOURCE.url),
+                        altTitles: [],
+                        genres: e.post_genres.split(", "),
+                        score: 0,
+                        chapters: [
+                            {
+                                mangaSlug: slug,
+                                name: e.post_latest,
+                                number: this.getChapterNumber(e.post_latest),
+                                source: source as any,
+                            },
+                        ],
+                        source: source as any,
+                    };
+                    return manga;
+                })
+                .filter((x) => x);
+        } catch {
+            return [];
+        }
     }
 
     async mangaList(
