@@ -226,9 +226,155 @@ const KISSMANGA: SourceSettings = {
     },
 };
 
+const mangakalotUrls = [
+    { url: "https://readmanganato.com", urlSlug: "readmanganato" },
+    { url: "https://manganato.com", urlSlug: "manganato" },
+    { url: "https://chapmanganato.com", urlSlug: "chapmanganato" },
+    { url: "https://mangakakalot.com", urlSlug: "mangakakalot" },
+];
+
+const MANGAKAKALOT: SourceSettings = {
+    url: "https://manganato.com",
+    pathes: {
+        mangaList: "/genre-all",
+        manga: "/",
+    },
+    selectors: {
+        mangaList: {
+            list: "div.panel-content-genres > div.content-genres-item",
+            url: "a",
+            cover: "a > img",
+            score: "a > em.genres-item-rate",
+            title: "div > h3 > a",
+            latestChapterName: "div > a.genres-item-chap.text-nowrap.a-h",
+            dropdown: { genre: "" },
+        },
+        manga: {
+            title: "div.panel-story-info > div.story-info-right > h1",
+            altTitles:
+                "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(1) > td.table-value > h2",
+            artist: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
+            author: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
+            cover: "div.panel-story-info > div.story-info-left > span.info-image > img",
+            genre: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(4) > td.table-value > a",
+            releasedAt: "",
+            score: "#rate_row_cmd > em > em:nth-child(2) > em > em:nth-child(1)",
+            status: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(3) > td.table-value",
+            synopsis: "#panel-story-info-description",
+            type: "",
+            chapter: {
+                list: "div.container.container-main > div.container-main-left > div.panel-story-chapter-list > ul > li > a",
+                name: "a",
+                number: "a",
+                url: "a",
+            },
+        },
+        chapter: {
+            page: "div.container-chapter-reader > img",
+            mangaUrl:
+                "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(3)",
+            name: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
+            next: "a.navi-change-chapter-btn-next.a-h",
+            prev: "a.navi-change-chapter-btn-prev.a-h",
+            number: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
+        },
+    },
+    utils: {
+        getMangaSlug(url: string) {
+            let urlSlug = "mangakakalot";
+            let replacedUrl = url?.replace(this.url, "");
+
+            mangakalotUrls.map((data) => {
+                if (url?.includes(data.urlSlug)) urlSlug = data.urlSlug;
+                replacedUrl = replacedUrl?.replace(data.url, "");
+            });
+
+            return urlSlug + "[]" + replacedUrl?.replace(this.pathes.manga, "");
+        },
+
+        getChapterSlug(url: string) {
+            let urlSlug = "mangakakalot";
+            let replacedUrl = url?.replace(this.url, "");
+
+            mangakalotUrls.map((data) => {
+                if (url?.includes(data.urlSlug)) urlSlug = data.urlSlug;
+                replacedUrl = replacedUrl?.replace(data.url, "");
+            });
+
+            return (
+                urlSlug + "[]" + replacedUrl?.replace(this.pathes.chapter, "")
+            );
+        },
+
+        async getSearchData(
+            query: string,
+            sourceData: SourceSettings,
+        ): Promise<Manga[]> {
+            const url = `https://manganato.com/getstorysearchjson`;
+
+            const { body } = await gotScraping(url, {
+                method: "POST",
+                dnsCache: true,
+                headers: {
+                    "content-type":
+                        "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+                body: `searchword=${query.replace(/ /g, "_")}`,
+            });
+
+            const { searchlist } = JSON.parse(body);
+
+            const results: Manga[] = searchlist.map((manga: any) => {
+                const mangaFormatted: Manga = {
+                    url: manga.url_story,
+                    altTitles: [],
+                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        manga.image,
+                    )}&referer=${encodeURIComponent(manga.url_story)}`,
+                    genres: [],
+                    slug: this.utils.getMangaSlug.bind(sourceData)(
+                        manga.url_story,
+                    ),
+                    source: Sources.MANGAKAKALOT,
+                    title: manga.name,
+                };
+                return mangaFormatted;
+            });
+
+            return results;
+        },
+
+        getMangaUrl(slug: string, page: number = 1) {
+            const [urlSlug, mangaSlug] = slug.split("[]");
+            const urlData = mangakalotUrls.find(
+                (url) => url.urlSlug === urlSlug,
+            );
+
+            return clearDupleSlashes(urlData.url + `/` + mangaSlug);
+        },
+
+        getMangaListUrl(page: number = 1) {
+            return clearDupleSlashes(
+                this.url + this.pathes.mangaList + `/${page}?type=topview`,
+            );
+        },
+
+        getChapterUrl(slug: string) {
+            const [urlSlug, chapterSlug] = slug.split("[]");
+            const urlData = mangakalotUrls.find(
+                (url) => url.urlSlug === urlSlug,
+            );
+
+            return clearDupleSlashes(urlData.url + `/` + chapterSlug);
+        },
+    },
+    source: Sources.MANGAKAKALOT,
+};
+
 const customSources = {
     TEAMX,
     KISSMANGA,
+    MANGAKAKALOT,
 };
 
 @Injectable()
@@ -394,6 +540,13 @@ export class CustomSourceService {
         });
         const $ = load(body);
 
+        const nextChapterUrl = $(sourceData.selectors.chapter.next).attr(
+            "href",
+        );
+        const prevChapterUrl = $(sourceData.selectors.chapter.prev).attr(
+            "href",
+        );
+
         const chapterData: Chapter = {
             url,
             slug,
@@ -404,12 +557,16 @@ export class CustomSourceService {
             mangaSlug: sourceData.utils.getMangaSlug.bind(sourceData)(
                 $(sourceData.selectors.chapter.mangaUrl).attr("href"),
             ),
-            nextSlug: sourceData.utils.getChapterSlug.bind(sourceData)(
-                $(sourceData.selectors.chapter.next).attr("href"),
-            ),
-            prevSlug: sourceData.utils.getChapterSlug.bind(sourceData)(
-                $(sourceData.selectors.chapter.prev).attr("href"),
-            ),
+            nextSlug:
+                nextChapterUrl &&
+                sourceData.utils.getChapterSlug.bind(sourceData)(
+                    nextChapterUrl,
+                ),
+            prevSlug:
+                prevChapterUrl &&
+                sourceData.utils.getChapterSlug.bind(sourceData)(
+                    prevChapterUrl,
+                ),
             pages: [],
             source: sourceData.source,
         };

@@ -1,6 +1,6 @@
 import { Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { gotScraping, OptionsOfTextResponseBody } from "got-scraping";
-import { load } from "cheerio/lib/slim";
+import { CheerioAPI, load } from "cheerio/lib/slim";
 import * as urlHandle from "url-query-handle";
 import { Manga } from "src/manga/entities/manga.entity";
 import { Chapter } from "src/chapters/entities/chapter.entity";
@@ -97,6 +97,13 @@ const SOURCES: SourcesSettings = {
             manga: "/series",
         },
     },
+    ASHQ: {
+        url: "https://3asq.org",
+        ...DEFAULT_SOURCE_SETTINGS,
+        pathes: {
+            manga: "/manga",
+        },
+    },
 };
 
 export type MadaraSources =
@@ -104,7 +111,8 @@ export type MadaraSources =
     | "MANGASPARK"
     | "AZORA"
     | "STKISSMANGA"
-    | "MANGAPROTM";
+    | "MANGAPROTM"
+    | "ASHQ";
 
 @Injectable()
 export class MadaraService {
@@ -259,36 +267,62 @@ export class MadaraService {
                 mangaInfo.genres.push($$("a").text()?.trim());
             });
 
-            const { body: chaptersBody } = await gotScraping(
-                `${SOURCE.url}/wp-admin/admin-ajax.php`,
-                {
-                    method: "POST",
-                    headers: {
-                        "content-type":
-                            "application/x-www-form-urlencoded; charset=UTF-8",
-                    },
-                    body: `action=manga_get_chapters&manga=${postID}`,
-                },
-            );
-
-            const chapter$ = load(chaptersBody);
-
-            chapter$(mangaSelectors.chapter.list).each((i, el) => {
-                const $$ = load(el);
-                const url = $$(mangaSelectors.chapter.url).attr("href") || "d";
-                const name = $$(mangaSelectors.chapter.name).text()?.trim();
-                mangaInfo.chapters.push({
-                    slug: this.getChapterSlug(source, url)?.trim(),
-                    url,
-                    mangaSlug: slug?.trim(),
-                    name: name?.trim(),
-                    number:
-                        Number(
-                            $$(mangaSelectors.chapter.number).attr("data-num"),
-                        ) || this.getChapterNumber(name?.trim()),
-                    source: source as any,
+            const loadChapters = ($s: CheerioAPI) => {
+                $s(mangaSelectors.chapter.list).each((i, el) => {
+                    const $$ = load(el);
+                    const url =
+                        $$(mangaSelectors.chapter.url).attr("href") || "d";
+                    const name = $$(mangaSelectors.chapter.name).text()?.trim();
+                    mangaInfo.chapters.push({
+                        slug: this.getChapterSlug(source, url)?.trim(),
+                        url,
+                        mangaSlug: slug?.trim(),
+                        name: name?.trim(),
+                        number:
+                            Number(
+                                $$(mangaSelectors.chapter.number).attr(
+                                    "data-num",
+                                ),
+                            ) || this.getChapterNumber(name?.trim()),
+                        source: source as any,
+                    });
                 });
-            });
+            };
+
+            loadChapters($);
+
+            if (mangaInfo.chapters.length <= 0) {
+                const { body: chaptersBody } = await gotScraping(
+                    `${SOURCE.url}/wp-admin/admin-ajax.php`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "content-type":
+                                "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        body: `action=manga_get_chapters&manga=${postID}`,
+                    },
+                );
+
+                const chapter$ = load(chaptersBody);
+                loadChapters(chapter$);
+            }
+
+            if (mangaInfo.chapters.length <= 0) {
+                console.log("hey?>?>!!");
+
+                const { body: chaptersBody } = await gotScraping(
+                    `${SOURCE.url}${SOURCE.pathes.manga}/${mangaInfo.slug}/ajax/chapters/`.replace(
+                        "//",
+                        "/",
+                    ),
+                    {
+                        method: "POST",
+                    },
+                );
+                const chapter$ = load(chaptersBody);
+                loadChapters(chapter$);
+            }
 
             return mangaInfo;
         }
