@@ -28,7 +28,7 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
             },
             cover: "img.wp-post-image",
             coverAttr: "src",
-            url: "div.bsx > a",
+            url: "div.post-title.font-title > h3 > a",
             score: "div.numscore",
             latestChapterName: "div.adds > div.epxs",
         },
@@ -76,7 +76,7 @@ const SOURCES: SourcesSettings = {
         ...DEFAULT_SOURCE_SETTINGS,
     },
     STKISSMANGA: {
-        url: "https://1stkissmanga.love",
+        url: "https://1stkissmanga.io",
         ...DEFAULT_SOURCE_SETTINGS,
         selectors: {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
@@ -100,9 +100,15 @@ const SOURCES: SourcesSettings = {
     ASHQ: {
         url: "https://3asq.org",
         ...DEFAULT_SOURCE_SETTINGS,
-        pathes: {
-            manga: "/manga",
+        selectors: {
+            ...DEFAULT_SOURCE_SETTINGS.selectors,
+            mangaList: {
+                ...DEFAULT_SOURCE_SETTINGS.selectors.mangaList,
+                url: "div.item-thumb.hover-details.c-image-hover > a",
+                
+            }   
         },
+
     },
 };
 
@@ -180,8 +186,8 @@ export class MadaraService {
                 `div.tab-content-wrap > div > div > div.page-listing-item > div > div`,
             ).each((i, el) => {
                 const $$ = load(el);
-                const a = $$("div.post-title.font-title > h3 > a");
-                const title = $$(`h3 > a`).text()?.trim();
+                const a = $$(SOURCE.selectors.mangaList.url);
+                const title = $$(`h3 > a:nth-child(2)`).text()?.trim() || $$(`h3 > a`).text()?.trim();
                 if (title.includes("Novel")) return;
                 const url = a.attr("href");
                 const slug = this.getMangaSlug(source, url);
