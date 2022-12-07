@@ -104,124 +104,127 @@ export class MangaService {
     }
 
     async addDexFieldsToArray(manga: Manga[]) {
-        const startDate = Date.now();
-        const startDateQuery = Date.now();
+        try {
+            const startDate = Date.now();
+            const startDateQuery = Date.now();
 
-        const mangaWithID: (Manga & { id: string })[] = manga.map((x) => ({
-            id: "id_" + randomUUID().replace(/\-/g, "_"),
-            ...x,
-        }));
+            const mangaWithID: (Manga & { id: string })[] = manga.map((x) => ({
+                id: "id_" + randomUUID().replace(/\-/g, "_"),
+                ...x,
+            }));
 
-        const query = `query MangaList {
-            ${mangaWithID
-                .map((manga) => {
-                    return `${manga.id}: mangaList(searchQuery: "${manga.title}") {
-                        pageInfo {
-                          total
-                          perPage
-                          currentPage
-                          lastPage
-                          hasNextPage
-                        }
-                        manga {
-                            id
-                            dexId
-                            covers {
-                              dexId
-                              locale
-                              fileName
-                              volume
+            const query = `query MangaList {
+                ${mangaWithID
+                    .map((manga) => {
+                        return `${manga.id}: mangaList(searchQuery: "${manga.title}") {
+                            pageInfo {
+                              total
+                              perPage
+                              currentPage
+                              lastPage
+                              hasNextPage
                             }
-                            title {
-                              en
-                            }
-                            altTitles
-                            description {
-                              en
-                            }
-                            status
-                            releaseYear
-                            links {
-                              nu
-                              al
-                              ap
-                              bw
-                              kt
-                              mu
-                              amz
-                              cdj
-                              ebj
-                              mal
-                              raw
-                              engtl
-                            }
-                            contentRating
-                            originalLanguage
-                            publicationDemographic
-                          }
-                      }`;
-                })
-                .join("\n")}
-          }`;
+                            manga {
+                                id
+                                dexId
+                                covers {
+                                  dexId
+                                  locale
+                                  fileName
+                                  volume
+                                }
+                                title {
+                                  en
+                                }
+                                altTitles
+                                description {
+                                  en
+                                }
+                                status
+                                releaseYear
+                                links {
+                                  nu
+                                  al
+                                  ap
+                                  bw
+                                  kt
+                                  mu
+                                  amz
+                                  cdj
+                                  ebj
+                                  mal
+                                  raw
+                                  engtl
+                                }
+                                contentRating
+                                originalLanguage
+                                publicationDemographic
+                              }
+                          }`;
+                    })
+                    .join("\n")}
+              }`;
 
-        const {
-            data: { data },
-        } = await axios({
-            url: "https://easydex-production.up.railway.app/graphql",
-            method: "POST",
-            data: {
-                operationName: "MangaList",
-                query: query,
-            },
-        });
+            const {
+                data: { data },
+            } = await axios({
+                url: "https://easydex-production.up.railway.app/graphql",
+                method: "POST",
+                data: {
+                    operationName: "MangaList",
+                    query: query,
+                },
+            });
 
-        console.log(Date.now() - startDateQuery + "ms");
+            console.log("queryTime:", Date.now() - startDateQuery + "ms");
 
-        const mangaWithDexFields = mangaWithID.map((manga) => {
-            const dexData = data[manga.id];
+            const mangaWithDexFields = mangaWithID.map((manga) => {
+                const dexData = data[manga.id];
 
-            if (dexData && dexData.manga?.length > 0) {
-                const resultsWithFuzzScore = dexData.manga.map(
-                    (dexManga: any) => {
-                        return {
-                            ...dexManga,
-                            score: Math.max(
-                                ratio(manga.title, dexManga.title.en),
-                                ...dexManga.altTitles.map((altTitle) =>
-                                    ratio(manga.title, altTitle),
+                if (dexData && dexData.manga?.length > 0) {
+                    const resultsWithFuzzScore = dexData.manga.map(
+                        (dexManga: any) => {
+                            return {
+                                ...dexManga,
+                                score: Math.max(
+                                    ratio(manga.title, dexManga.title.en),
+                                    ...dexManga.altTitles.map((altTitle) =>
+                                        ratio(manga.title, altTitle),
+                                    ),
                                 ),
-                            ),
-                        };
-                    },
-                );
+                            };
+                        },
+                    );
 
-                const bestFuseResult = resultsWithFuzzScore.sort(
-                    (a, b) => b.score - a.score,
-                )[0];
+                    const bestFuseResult = resultsWithFuzzScore.sort(
+                        (a, b) => b.score - a.score,
+                    )[0];
 
-                const dexMangaData =
-                    bestFuseResult.score > 90 ? bestFuseResult : null;
+                    const dexMangaData =
+                        bestFuseResult.score > 90 ? bestFuseResult : null;
 
-                if (!dexMangaData) return manga;
+                    if (!dexMangaData) return manga;
 
-                const neededInfo = {
-                    dexId: dexMangaData?.dexId,
-                    aniId: dexMangaData?.links.al,
-                    muId: dexMangaData?.links.mu,
-                    cover: this.mangaReader.genereateImageUrl(
-                        `https://mangadex.org/covers/${dexMangaData.dexId}/${dexMangaData?.covers?.[0].fileName}`,
-                        "https://mangadex.org/",
-                    ),
-                };
+                    const neededInfo = {
+                        dexId: dexMangaData?.dexId,
+                        aniId: dexMangaData?.links.al,
+                        muId: dexMangaData?.links.mu,
+                        cover: this.mangaReader.genereateImageUrl(
+                            `https://mangadex.org/covers/${dexMangaData.dexId}/${dexMangaData?.covers?.[dexMangaData?.covers.length - 1].fileName}`,
+                            "https://mangadex.org/",
+                        ),
+                    };
 
-                return { ...manga, ...neededInfo };
-            }
+                    return { ...manga, ...neededInfo };
+                }
 
+                return manga;
+            });
+
+            console.log("totalTime:", Date.now() - startDate + "ms");
+            return mangaWithDexFields;
+        } catch {
             return manga;
-        });
-
-        console.log(Date.now() - startDate + "ms");
-
-        return mangaWithDexFields;
+        }
     }
 }
