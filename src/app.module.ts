@@ -20,8 +20,8 @@ import { AppController } from "./app.controller";
             introspection: true,
             cache: "bounded",
             plugins: [
-                // ApolloServerPluginCacheControl({ defaultMaxAge: 30 }), // optional
-                // responseCachePlugin(),
+                ApolloServerPluginCacheControl({ defaultMaxAge: 30 }), // optional
+                responseCachePlugin(),
             ],
         }),
         MangaModule,

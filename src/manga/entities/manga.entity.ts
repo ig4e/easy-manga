@@ -16,6 +16,8 @@ export class Manga {
     url: string;
     @Field()
     cover: string;
+    @Field(() => [MangaCover], { nullable: true })
+    covers?: MangaCover[];
     @Field()
     title: string;
     @Field(() => [String])
@@ -40,4 +42,12 @@ export class Manga {
     chapters?: Chapter[];
     @Field((type) => Sources, { defaultValue: "ARES" })
     source: Sources;
+}
+
+@ObjectType()
+class MangaCover {
+    @Field()
+    url: string;
+    @Field()
+    volume: string;
 }

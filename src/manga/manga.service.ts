@@ -182,27 +182,7 @@ export class MangaService {
                 const dexData = data[manga.id];
 
                 if (dexData && dexData.manga?.length > 0) {
-                    const resultsWithFuzzScore = dexData.manga.map(
-                        (dexManga: any) => {
-                            return {
-                                ...dexManga,
-                                score: Math.max(
-                                    ratio(manga.title, dexManga.title.en),
-                                    ...dexManga.altTitles.map((altTitle) =>
-                                        ratio(manga.title, altTitle),
-                                    ),
-                                ),
-                            };
-                        },
-                    );
-
-                    const bestFuseResult = resultsWithFuzzScore.sort(
-                        (a, b) => b.score - a.score,
-                    )[0];
-
-                    const dexMangaData =
-                        bestFuseResult.score > 90 ? bestFuseResult : null;
-
+                    const dexMangaData = dexData.manga[0];
                     if (!dexMangaData) return manga;
 
                     const neededInfo = {
@@ -210,9 +190,24 @@ export class MangaService {
                         aniId: dexMangaData?.links.al,
                         muId: dexMangaData?.links.mu,
                         cover: this.mangaReader.genereateImageUrl(
-                            `https://mangadex.org/covers/${dexMangaData.dexId}/${dexMangaData?.covers?.[dexMangaData?.covers.length - 1].fileName}`,
+                            `https://mangadex.org/covers/${
+                                dexMangaData.dexId
+                            }/${
+                                dexMangaData?.covers?.[
+                                    dexMangaData?.covers.length - 1
+                                ].fileName
+                            }`,
                             "https://mangadex.org/",
                         ),
+                        covers: dexMangaData.covers.map((cover) => {
+                            return {
+                                url: this.mangaReader.genereateImageUrl(
+                                    `https://mangadex.org/covers/${dexMangaData.dexId}/${cover.fileName}`,
+                                    "https://mangadex.org/",
+                                ),
+                                volume: cover.volume
+                            };
+                        }),
                     };
 
                     return { ...manga, ...neededInfo };
