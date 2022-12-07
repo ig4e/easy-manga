@@ -380,13 +380,17 @@ const customSources = {
 @Injectable()
 export class CustomSourceService {
     async search(source: Sources, query: string) {
-        const sourceData: SourceSettings = customSources[source];
-        const data = await sourceData.utils.getSearchData.bind(sourceData)(
-            query,
-            sourceData,
-        );
+        try {
+            const sourceData: SourceSettings = customSources[source];
+            const data = await sourceData.utils.getSearchData.bind(sourceData)(
+                query,
+                sourceData,
+            );
 
-        return data;
+            return data;
+        } catch {
+            return [];
+        }
     }
 
     async mangaList(source: Sources, page: number = 0) {

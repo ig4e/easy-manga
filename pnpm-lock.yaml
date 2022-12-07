@@ -32,6 +32,7 @@ specifiers:
   fastify: 3.17.0
   fastify-accepts: ^2.3.0
   fuse.js: ^6.6.2
+  fuzzball: ^2.1.2
   got-scraping: ^3.2.10
   graphql: ^16.6.0
   jest: 28.1.2
@@ -73,6 +74,7 @@ dependencies:
   fastify: 3.17.0
   fastify-accepts: 2.3.0
   fuse.js: 6.6.2
+  fuzzball: 2.1.2
   got-scraping: 3.2.10
   graphql: 16.6.0
   js-beautify: 1.14.6
@@ -4392,6 +4394,15 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
+  /fuzzball/2.1.2:
+    resolution: {integrity: sha512-wVBw/a73M3luaX6ZHt9vIoEKT/rLqBkzdBRhQzWw/IQyIt0qnqc0IAJDCkX3CLgj2tRIUAfgDUT8G6YuMpmNXg==}
+    dependencies:
+      heap: 0.2.7
+      setimmediate: 1.0.5
+      string.fromcodepoint: 0.2.1
+      string.prototype.codepointat: 0.2.1
+    dev: false
+
   /generative-bayesian-network/2.0.7:
     resolution: {integrity: sha512-MQyQ+F9/QMXHZhLRi0Qv6DhFJFu/DWrwrRxuZVn/W5BT38op04lYM1+ii4ya2D8DQa+9Fvmxa9RTdO1ndTlUUw==}
     dependencies:
@@ -4606,6 +4617,10 @@ packages:
       generative-bayesian-network: 2.0.7
       ow: 0.28.1
       tslib: 2.4.0
+    dev: false
+
+  /heap/0.2.7:
+    resolution: {integrity: sha512-2bsegYkkHO+h/9MGbn6KWcE45cHZgPANo5LXF7EvWdT0yT2EguSVO1nDgU5c8+ZOPwp2vMNa7YFsJhVcDR9Sdg==}
     dev: false
 
   /hexoid/1.0.0:
@@ -6564,6 +6579,10 @@ packages:
     resolution: {integrity: sha512-1jeBGaKNGdEq4FgIrORu/N570dwoPYio8lSoYLWmX7sQ//0JY08Xh9o5pBcgmHQ/MbsYp/aZnOe1s1lIsbLprQ==}
     dev: false
 
+  /setimmediate/1.0.5:
+    resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
+    dev: false
+
   /setprototypeof/1.1.1:
     resolution: {integrity: sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==}
     dev: false
@@ -6727,6 +6746,14 @@ packages:
       is-fullwidth-code-point: 3.0.0
       strip-ansi: 6.0.1
     dev: true
+
+  /string.fromcodepoint/0.2.1:
+    resolution: {integrity: sha512-n69H31OnxSGSZyZbgBlvYIXlrMhJQ0dQAX1js1QDhpaUH6zmU3QYlj07bCwCNlPOu3oRXIubGPl2gDGnHsiCqg==}
+    dev: false
+
+  /string.prototype.codepointat/0.2.1:
+    resolution: {integrity: sha512-2cBVCj6I4IOvEnjgO/hWqXjqBGsY+zwPmHl12Srk9IXSZ56Jwwmy+66XO5Iut/oQVR7t5ihYdLB0GMa4alEUcg==}
+    dev: false
 
   /string_decoder/1.1.1:
     resolution: {integrity: sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==}

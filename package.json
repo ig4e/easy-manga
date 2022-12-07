@@ -43,6 +43,7 @@
         "fastify": "3.17.0",
         "fastify-accepts": "^2.3.0",
         "fuse.js": "^6.6.2",
+        "fuzzball": "^2.1.2",
         "got-scraping": "^3.2.10",
         "graphql": "^16.6.0",
         "js-beautify": "^1.14.6",

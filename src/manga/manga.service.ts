@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import axios from "axios";
+import { randomUUID } from "crypto";
 import { CustomSourceService } from "../sources/custom/custom.service";
 import { MadaraService, MadaraSources } from "../sources/madara/madara.service";
 import { MangaDexService } from "../sources/manga-dex/manga-dex.service";
@@ -14,6 +16,8 @@ import {
     SourcesType,
 } from "./dto/manga.input";
 import { Manga } from "./entities/manga.entity";
+import Fuse from "fuse.js";
+import { ratio } from "fuzzball";
 
 @Injectable()
 export class MangaService {
@@ -26,144 +30,198 @@ export class MangaService {
 
     async search(input: MangaSearchInput) {
         let { mangaReader, madara, custom } = SourcesType;
+        let mangaArrResult: Manga[];
+
         if (mangaReader.includes(input.source)) {
-            return await Promise.all(
-                await this.mangaReader.search(
-                    input.source as MangaReaderSources,
-                    input.query,
-                ),
+            mangaArrResult = await this.mangaReader.search(
+                input.source as MangaReaderSources,
+                input.query,
             );
         } else if (madara.includes(input.source)) {
-            return await Promise.all(
-                (
-                    await this.madara.search(
-                        input.source as MadaraSources,
-                        input.query,
-                    )
-                ).map(this.addDexFields.bind(this)),
+            mangaArrResult = await this.madara.search(
+                input.source as MadaraSources,
+                input.query,
             );
         } else if (custom.includes(input.source)) {
-            return await Promise.all(
-                await this.customSource.search(input.source, input.query),
+            mangaArrResult = await this.customSource.search(
+                input.source,
+                input.query,
             );
         }
+
+        return await this.addDexFieldsToArray(mangaArrResult);
     }
 
     async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES }) {
         let { mangaReader, madara, custom } = SourcesType;
+        let mangaArrResult: Manga[];
+
         if (mangaReader.includes(input.source)) {
-            return Promise.all(
-                (
-                    await this.mangaReader.mangaList(
-                        input.source as MangaReaderSources,
-                        { page: input.page, ...input.filters },
-                    )
-                ).map(this.addDexFields.bind(this)),
+            mangaArrResult = await this.mangaReader.mangaList(
+                input.source as MangaReaderSources,
+                { page: input.page, ...input.filters },
             );
         } else if (madara.includes(input.source)) {
-            return Promise.all(
-                (
-                    await this.madara.mangaList(
-                        input.source as MadaraSources,
-                        input.page,
-                    )
-                ).map(this.addDexFields.bind(this)),
+            mangaArrResult = await this.madara.mangaList(
+                input.source as MadaraSources,
+                input.page,
             );
         } else if (custom.includes(input.source)) {
-            return Promise.all(
-                (
-                    await this.customSource.mangaList(input.source, input.page)
-                ).map(this.addDexFields.bind(this)),
+            mangaArrResult = await this.customSource.mangaList(
+                input.source,
+                input.page,
             );
         }
+
+        return await this.addDexFieldsToArray(mangaArrResult);
     }
 
     async manga(input: MangaUniqueInput) {
         let { mangaReader, madara, custom } = SourcesType;
+        let resultManga: Manga;
+
         if (mangaReader.includes(input.source)) {
             let manga = await this.mangaReader.manga(
                 input.source as MangaReaderSources,
                 input.slug,
             );
             if (!manga) throw new NotFoundException();
-
-            return this.addDexFields(manga);
+            resultManga = manga;
         } else if (madara.includes(input.source)) {
             let manga = await this.madara.manga(
                 input.source as MadaraSources,
                 input.slug,
             );
-
-            return this.addDexFields(manga);
+            resultManga = manga;
         } else if (custom.includes(input.source)) {
             let manga = await this.customSource.manga(input.source, input.slug);
-            return this.addDexFields(manga);
+            resultManga = manga;
         }
+
+        const withDex = await this.addDexFieldsToArray([resultManga]);
+
+        return withDex[0];
     }
 
-    async getDexResult(query: string) {
-        //return { ok: false };
-        let dexResult: any = await this.mangaDex.search(query);
-        if (dexResult) {
-            let image =
-                `https://uploads.mangadex.org/covers/` +
-                dexResult.id +
-                `/` +
-                dexResult.relationships.find(
-                    (relation) => relation.type === "cover_art",
-                )?.attributes?.fileName;
+    async addDexFieldsToArray(manga: Manga[]) {
+        const startDate = Date.now();
+        const startDateQuery = Date.now();
 
-            let author = dexResult.relationships.find(
-                (relation) => relation.type === "author",
-            );
+        const mangaWithID: (Manga & { id: string })[] = manga.map((x) => ({
+            id: "id_" + randomUUID().replace(/\-/g, "_"),
+            ...x,
+        }));
 
-            let artist = dexResult.relationships.find(
-                (relation) => relation.type === "artist",
-            );
+        const query = `query MangaList {
+            ${mangaWithID
+                .map((manga) => {
+                    return `${manga.id}: mangaList(searchQuery: "${manga.title}") {
+                        pageInfo {
+                          total
+                          perPage
+                          currentPage
+                          lastPage
+                          hasNextPage
+                        }
+                        manga {
+                            id
+                            dexId
+                            covers {
+                              dexId
+                              locale
+                              fileName
+                              volume
+                            }
+                            title {
+                              en
+                            }
+                            altTitles
+                            description {
+                              en
+                            }
+                            status
+                            releaseYear
+                            links {
+                              nu
+                              al
+                              ap
+                              bw
+                              kt
+                              mu
+                              amz
+                              cdj
+                              ebj
+                              mal
+                              raw
+                              engtl
+                            }
+                            contentRating
+                            originalLanguage
+                            publicationDemographic
+                          }
+                      }`;
+                })
+                .join("\n")}
+          }`;
 
-            return {
-                dexId: dexResult.id,
-                aniId: dexResult?.attributes?.links?.al,
-                muId: dexResult?.attributes?.links?.mu,
-                cover: image,
-                releaseYear: dexResult?.attributes?.year,
-                author: author?.attributes?.name,
-                artist: artist?.attributes?.name,
-                status: dexResult?.attributes?.status,
-                year: dexResult?.attributes?.year,
-                originalLanguage: dexResult?.attributes?.originalLanguage,
-                ok: true,
-            };
-        } else return { ok: false };
-    }
+        const {
+            data: { data },
+        } = await axios({
+            url: "https://easydex-production.up.railway.app/graphql",
+            method: "POST",
+            data: {
+                operationName: "MangaList",
+                query: query,
+            },
+        });
 
-    async addDexFields(manga: Manga) {
-        let {
-            aniId,
-            artist,
-            author,
-            cover,
-            dexId,
-            muId,
-            releaseYear,
-            ok,
-            year,
-            originalLanguage,
-            status,
-        } = await this.getDexResult(manga.title);
-        if (ok) {
-            manga.dexId = dexId;
-            manga.aniId = aniId;
-            manga.muId = muId;
-            manga.cover = this.mangaReader.genereateImageUrl(
-                cover,
-                "mangadex.org",
-            );
-            if (releaseYear) manga.releaseYear = releaseYear;
-            if (author) manga.author = author;
-            if (artist) manga.artist = artist;
-            if (status) manga.status = status;
-        }
-        return manga;
+        console.log(Date.now() - startDateQuery + "ms");
+
+        const mangaWithDexFields = mangaWithID.map((manga) => {
+            const dexData = data[manga.id];
+
+            if (dexData && dexData.manga?.length > 0) {
+                const resultsWithFuzzScore = dexData.manga.map(
+                    (dexManga: any) => {
+                        return {
+                            ...dexManga,
+                            score: Math.max(
+                                ratio(manga.title, dexManga.title.en),
+                                ...dexManga.altTitles.map((altTitle) =>
+                                    ratio(manga.title, altTitle),
+                                ),
+                            ),
+                        };
+                    },
+                );
+
+                const bestFuseResult = resultsWithFuzzScore.sort(
+                    (a, b) => b.score - a.score,
+                )[0];
+
+                const dexMangaData =
+                    bestFuseResult.score > 90 ? bestFuseResult : null;
+
+                if (!dexMangaData) return manga;
+
+                const neededInfo = {
+                    dexId: dexMangaData?.dexId,
+                    aniId: dexMangaData?.links.al,
+                    muId: dexMangaData?.links.mu,
+                    cover: this.mangaReader.genereateImageUrl(
+                        `https://mangadex.org/covers/${dexMangaData.dexId}/${dexMangaData?.covers?.[0].fileName}`,
+                        "https://mangadex.org/",
+                    ),
+                };
+
+                return { ...manga, ...neededInfo };
+            }
+
+            return manga;
+        });
+
+        console.log(Date.now() - startDate + "ms");
+
+        return mangaWithDexFields;
     }
 }
