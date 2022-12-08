@@ -18,6 +18,7 @@ import {
 import { Manga } from "./entities/manga.entity";
 import Fuse from "fuse.js";
 import { ratio } from "fuzzball";
+import { MeiliService } from "../meili.service";
 
 @Injectable()
 export class MangaService {
@@ -26,6 +27,7 @@ export class MangaService {
         private madara: MadaraService,
         private customSource: CustomSourceService,
         private mangaDex: MangaDexService,
+        private meili: MeiliService,
     ) {}
 
     async search(input: MangaSearchInput) {
@@ -104,122 +106,163 @@ export class MangaService {
     }
 
     async addDexFieldsToArray(manga: Manga[]) {
-        try {
-            const startDate = Date.now();
-            const startDateQuery = Date.now();
+        const mangaWithDexFields = await Promise.all(
+            manga.map(async (manga) => {
+                const { hits } = await this.meili
+                    .index("manga")
+                    .search(manga.title, { limit: 1 });
 
-            const mangaWithID: (Manga & { id: string })[] = manga.map((x) => ({
-                id: "id_" + randomUUID().replace(/\-/g, "_"),
-                ...x,
-            }));
+                const dexMangaData = hits[0];
 
-            const query = `query MangaList {
-                ${mangaWithID
-                    .map((manga) => {
-                        return `${manga.id}: mangaList(searchQuery: "${manga.title}") {
-                            pageInfo {
-                              total
-                              perPage
-                              currentPage
-                              lastPage
-                              hasNextPage
-                            }
-                            manga {
-                                id
-                                dexId
-                                covers {
-                                  dexId
-                                  locale
-                                  fileName
-                                  volume
-                                }
-                                title {
-                                  en
-                                }
-                                altTitles
-                                description {
-                                  en
-                                }
-                                status
-                                releaseYear
-                                links {
-                                  nu
-                                  al
-                                  ap
-                                  bw
-                                  kt
-                                  mu
-                                  amz
-                                  cdj
-                                  ebj
-                                  mal
-                                  raw
-                                  engtl
-                                }
-                                contentRating
-                                originalLanguage
-                                publicationDemographic
-                              }
-                          }`;
-                    })
-                    .join("\n")}
-              }`;
+                if (!dexMangaData) return manga;
 
-            const {
-                data: { data },
-            } = await axios({
-                url: "https://easydex-production.up.railway.app/graphql",
-                method: "POST",
-                data: {
-                    operationName: "MangaList",
-                    query: query,
-                },
-            });
+                const neededInfo = {
+                    dexId: dexMangaData?.dexId,
+                    aniId: dexMangaData?.links.al,
+                    muId: dexMangaData?.links.mu,
+                    cover: this.mangaReader.genereateImageUrl(
+                        `https://mangadex.org/covers/${dexMangaData.dexId}/${
+                            dexMangaData?.covers?.[
+                                dexMangaData?.covers.length - 1
+                            ].fileName
+                        }`,
+                        "https://mangadex.org/",
+                    ),
+                    covers: dexMangaData.covers.map((cover) => {
+                        return {
+                            url: this.mangaReader.genereateImageUrl(
+                                `https://mangadex.org/covers/${dexMangaData.dexId}/${cover.fileName}`,
+                                "https://mangadex.org/",
+                            ),
+                            volume: cover.volume,
+                        };
+                    }),
+                };
 
-            console.log("queryTime:", Date.now() - startDateQuery + "ms");
+                return { ...manga, ...neededInfo };
+            }),
+        );
 
-            const mangaWithDexFields = mangaWithID.map((manga) => {
-                const dexData = data[manga.id];
-
-                if (dexData && dexData.manga?.length > 0) {
-                    const dexMangaData = dexData.manga[0];
-                    if (!dexMangaData) return manga;
-
-                    const neededInfo = {
-                        dexId: dexMangaData?.dexId,
-                        aniId: dexMangaData?.links.al,
-                        muId: dexMangaData?.links.mu,
-                        cover: this.mangaReader.genereateImageUrl(
-                            `https://mangadex.org/covers/${
-                                dexMangaData.dexId
-                            }/${
-                                dexMangaData?.covers?.[
-                                    dexMangaData?.covers.length - 1
-                                ].fileName
-                            }`,
-                            "https://mangadex.org/",
-                        ),
-                        covers: dexMangaData.covers.map((cover) => {
-                            return {
-                                url: this.mangaReader.genereateImageUrl(
-                                    `https://mangadex.org/covers/${dexMangaData.dexId}/${cover.fileName}`,
-                                    "https://mangadex.org/",
-                                ),
-                                volume: cover.volume
-                            };
-                        }),
-                    };
-
-                    return { ...manga, ...neededInfo };
-                }
-
-                return manga;
-            });
-
-            console.log("totalTime:", Date.now() - startDate + "ms");
-            return mangaWithDexFields;
-        } catch {
-            return manga;
-        }
+        return mangaWithDexFields;
     }
+
+    // async addDexFieldsToArray(manga: Manga[]) {
+    //     try {
+    //         const startDate = Date.now();
+    //         const startDateQuery = Date.now();
+
+    //         const mangaWithID: (Manga & { id: string })[] = manga.map((x) => ({
+    //             id: "id_" + randomUUID().replace(/\-/g, "_"),
+    //             ...x,
+    //         }));
+
+    //         const query = `query MangaList {
+    //             ${mangaWithID
+    //                 .map((manga) => {
+    //                     return `${manga.id}: mangaList(searchQuery: "${manga.title}") {
+    //                         pageInfo {
+    //                           total
+    //                           perPage
+    //                           currentPage
+    //                           lastPage
+    //                           hasNextPage
+    //                         }
+    //                         manga {
+    //                             id
+    //                             dexId
+    //                             covers {
+    //                               dexId
+    //                               locale
+    //                               fileName
+    //                               volume
+    //                             }
+    //                             title {
+    //                               en
+    //                             }
+    //                             altTitles
+    //                             description {
+    //                               en
+    //                             }
+    //                             status
+    //                             releaseYear
+    //                             links {
+    //                               nu
+    //                               al
+    //                               ap
+    //                               bw
+    //                               kt
+    //                               mu
+    //                               amz
+    //                               cdj
+    //                               ebj
+    //                               mal
+    //                               raw
+    //                               engtl
+    //                             }
+    //                             contentRating
+    //                             originalLanguage
+    //                             publicationDemographic
+    //                           }
+    //                       }`;
+    //                 })
+    //                 .join("\n")}
+    //           }`;
+
+    //         const {
+    //             data: { data },
+    //         } = await axios({
+    //             url: "https://easydex-production.up.railway.app/graphql",
+    //             method: "POST",
+    //             data: {
+    //                 operationName: "MangaList",
+    //                 query: query,
+    //             },
+    //         });
+
+    //         console.log("queryTime:", Date.now() - startDateQuery + "ms");
+
+    //         const mangaWithDexFields = mangaWithID.map((manga) => {
+    //             const dexData = data[manga.id];
+
+    //             if (dexData && dexData.manga?.length > 0) {
+    //                 const dexMangaData = dexData.manga[0];
+    //                 if (!dexMangaData) return manga;
+
+    //                 const neededInfo = {
+    //                     dexId: dexMangaData?.dexId,
+    //                     aniId: dexMangaData?.links.al,
+    //                     muId: dexMangaData?.links.mu,
+    //                     cover: this.mangaReader.genereateImageUrl(
+    //                         `https://mangadex.org/covers/${
+    //                             dexMangaData.dexId
+    //                         }/${
+    //                             dexMangaData?.covers?.[
+    //                                 dexMangaData?.covers.length - 1
+    //                             ].fileName
+    //                         }`,
+    //                         "https://mangadex.org/",
+    //                     ),
+    //                     covers: dexMangaData.covers.map((cover) => {
+    //                         return {
+    //                             url: this.mangaReader.genereateImageUrl(
+    //                                 `https://mangadex.org/covers/${dexMangaData.dexId}/${cover.fileName}`,
+    //                                 "https://mangadex.org/",
+    //                             ),
+    //                             volume: cover.volume
+    //                         };
+    //                     }),
+    //                 };
+
+    //                 return { ...manga, ...neededInfo };
+    //             }
+
+    //             return manga;
+    //         });
+
+    //         console.log("totalTime:", Date.now() - startDate + "ms");
+    //         return mangaWithDexFields;
+    //     } catch {
+    //         return manga;
+    //     }
+    // }
 }

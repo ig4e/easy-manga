@@ -6,8 +6,9 @@ import { MangaService } from '.././manga/manga.service';
 import { MangaDexService } from '../sources/manga-dex/manga-dex.service';
 import { MadaraService } from '../sources/madara/madara.service';
 import { CustomSourceService } from '../sources/custom/custom.service';
+import { MeiliService } from '../meili.service';
 
 @Module({
-  providers: [ChaptersResolver, ChaptersService, MangaReaderService, MangaService, MangaDexService, MadaraService, CustomSourceService]
+  providers: [ChaptersResolver, ChaptersService, MangaReaderService, MangaService, MangaDexService, MadaraService, CustomSourceService, MeiliService]
 })
 export class ChaptersModule {}

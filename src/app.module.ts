@@ -11,6 +11,7 @@ import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
 import responseCachePlugin from "apollo-server-plugin-response-cache";
 import { ApolloServerPluginCacheControl } from "apollo-server-core/dist/plugin/cacheControl";
 import { AppController } from "./app.controller";
+import { MeiliService } from "./meili.service";
 
 @Module({
     imports: [
@@ -29,7 +30,7 @@ import { AppController } from "./app.controller";
         SourcesDataModule,
         GenresModule,
     ],
-    providers: [MangaReaderService, MadaraService],
+    providers: [MangaReaderService, MadaraService, MeiliService],
     controllers: [AppController],
 })
 export class AppModule {}

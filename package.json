@@ -47,6 +47,7 @@
         "got-scraping": "^3.2.10",
         "graphql": "^16.6.0",
         "js-beautify": "^1.14.6",
+        "meilisearch": "^0.30.0",
         "moment": "^2.29.4",
         "nestjs-gql-cache-control": "^0.1.2",
         "qs": "^6.11.0",
