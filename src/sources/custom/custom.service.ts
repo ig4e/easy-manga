@@ -12,6 +12,9 @@ const TEAMX: SourceSettings = {
     source: Sources.TEAMX,
     url: "https://mnhaestate.com",
     pathes: { manga: "/series" },
+    config: {
+        scoreMultiplyBy: 1,
+    },
     selectors: {
         manga: {
             title: "div.author-info-title > h1",
@@ -113,6 +116,9 @@ const TEAMX: SourceSettings = {
 
 const KISSMANGA: SourceSettings = {
     source: Sources.KISSMANGA,
+    config: {
+        scoreMultiplyBy: 1,
+    },
     url: "https://kissmanga.org",
     pathes: { manga: "/manga", mangaList: "/manga_list", chapter: "/chapter" },
     selectors: {
@@ -238,6 +244,9 @@ const MANGAKAKALOT: SourceSettings = {
     pathes: {
         mangaList: "/genre-all",
         manga: "/",
+    },
+    config: {
+        scoreMultiplyBy: 2,
     },
     selectors: {
         mangaList: {
@@ -422,7 +431,7 @@ export class CustomSourceService {
                 source: sourceData.source,
                 score: Number(
                     $$(sourceData.selectors.mangaList.score).text()?.trim(),
-                ),
+                ) * sourceData.config.scoreMultiplyBy,
                 chapters: [],
             };
 
@@ -459,7 +468,7 @@ export class CustomSourceService {
             releaseYear: Number(
                 $(sourceData.selectors.manga.releasedAt).text()?.trim(),
             ),
-            score: Number($(sourceData.selectors.manga.score).text()?.trim()),
+            score: Number($(sourceData.selectors.manga.score).text()?.trim()) * sourceData.config.scoreMultiplyBy,
             status: $(sourceData.selectors.manga.status).text()?.trim(),
             type: $(sourceData.selectors.manga.type).text()?.trim(),
 
@@ -607,6 +616,9 @@ export interface SourceSettings {
         manga: string;
         mangaList?: string;
         chapter?: string;
+    };
+    config: {
+        scoreMultiplyBy: number,
     };
     utils: {
         [index: string]: Function;

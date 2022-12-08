@@ -23,6 +23,6 @@ export class Chapter {
     otherChapters?: Chapter[];
     @Field(() => [String], { nullable: true })
     pages?: string[];
-    @Field((type) => Sources, { defaultValue: "ARES" })
+    @Field((type) => Sources, { defaultValue: "MANGAKAKALOT" })
     source?: Sources;
 }

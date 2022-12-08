@@ -139,6 +139,7 @@ export class MangaService {
                             volume: cover.volume,
                         };
                     }),
+                    altTitles: dexMangaData.altTitles,
                 };
 
                 return { ...manga, ...neededInfo };

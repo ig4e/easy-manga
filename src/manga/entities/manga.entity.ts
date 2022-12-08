@@ -40,7 +40,7 @@ export class Manga {
     score?: number;
     @Field(() => [Chapter], { nullable: true })
     chapters?: Chapter[];
-    @Field((type) => Sources, { defaultValue: "ARES" })
+    @Field((type) => Sources, { defaultValue: "MANGAKAKALOT" })
     source: Sources;
 }
 
