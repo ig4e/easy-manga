@@ -108,9 +108,11 @@ export class MangaService {
     async addDexFieldsToArray(manga: Manga[]) {
         const mangaWithDexFields = await Promise.all(
             manga.map(async (manga) => {
+                if (!manga) return manga;
+
                 const { hits } = await this.meili
                     .index("manga")
-                    .search(manga.title, { limit: 1 });
+                    .search(manga?.title, { limit: 1 });
 
                 const dexMangaData = hits[0];
 
@@ -143,7 +145,7 @@ export class MangaService {
             }),
         );
 
-        return mangaWithDexFields;
+        return mangaWithDexFields.filter((manga) => manga);
     }
 
     // async addDexFieldsToArray(manga: Manga[]) {
