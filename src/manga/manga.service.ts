@@ -110,11 +110,65 @@ export class MangaService {
             manga.map(async (manga) => {
                 if (!manga) return manga;
 
-                const { hits } = await this.meili
-                    .index("manga")
-                    .search(manga?.title, { limit: 1 });
+                const { data } = await axios({
+                    method: "POST",
+                    url: "https://data.mongodb-api.com/app/data-ykgku/endpoint/data/v1/action/aggregate",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Request-Headers": "*",
+                        "api-key":
+                            "6kCvNRcJ63IfZ0fyNSNjXn7J1PXy7NLYYx4ovzrfV57V0BSLR8EGotFyuUOXWrm3",
+                    },
+                    data: {
+                        dataSource: "Cluster0",
+                        database: "prod",
+                        collection: "Manga",
+                        pipeline: [
+                            {
+                                $search: {
+                                    index: "default",
+                                    compound: {
+                                        should: [
+                                            {
+                                                text: {
+                                                    query: manga.title,
+                                                    path: "title.en",
+                                                    score: {
+                                                        boost: {
+                                                            value: 2,
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                            {
+                                                text: {
+                                                    query: manga.title,
+                                                    path: "altTitles",
+                                                    score: {
+                                                        boost: {
+                                                            value: 1.5,
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            {
+                                $limit: 16,
+                            },
+                        ],
+                    },
+                });
 
-                const dexMangaData = hits[0];
+                const fuse = new Fuse(data.documents, {
+                    keys: ["title.en", "altTitles"],
+                });
+
+                const fuseResult = fuse.search(manga.title);
+
+                const dexMangaData = fuseResult?.[0]?.item as any;
 
                 if (!dexMangaData) return manga;
 
