@@ -66,34 +66,38 @@ const TEAMX: SourceSettings = {
         },
 
         async getSearchData(query: string, sourceData: SourceSettings) {
-            const results: Manga[] = [];
-            const url = `https://mnhaestate.com/ajax/search?keyword=${encodeURIComponent(
-                query,
-            )}`;
-            const { body } = await gotScraping(url, {
-                method: "GET",
-                dnsCache: true,
-            });
-
-            const $ = load(body);
-
-            $(`ol > li`).each((i, el) => {
-                const $$ = load(el);
-                const url = $$(`a`).attr("href");
-                results.push({
-                    url,
-                    slug: this.utils.getMangaSlug.bind(sourceData)(url),
-                    title: $$(`a`).text()?.trim(),
-                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
-                        $$("a > img").attr("src"),
-                    )}&referer=${encodeURIComponent(url)}`,
-                    altTitles: [],
-                    genres: [],
-                    source: sourceData.source,
+            try {
+                const results: Manga[] = [];
+                const url = `https://mnhaestate.com/ajax/search?keyword=${encodeURIComponent(
+                    query,
+                )}`;
+                const { body } = await gotScraping(url, {
+                    method: "GET",
+                    dnsCache: true,
                 });
-            });
 
-            return results;
+                const $ = load(body);
+
+                $(`ol > li`).each((i, el) => {
+                    const $$ = load(el);
+                    const url = $$(`a`).attr("href");
+                    results.push({
+                        url,
+                        slug: this.utils.getMangaSlug.bind(sourceData)(url),
+                        title: $$(`a`).text()?.trim(),
+                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                            $$("a > img").attr("src"),
+                        )}&referer=${encodeURIComponent(url)}`,
+                        altTitles: [],
+                        genres: [],
+                        source: sourceData.source,
+                    });
+                });
+
+                return results;
+            } catch {
+                return [];
+            }
         },
 
         getMangaUrl(slug: string, page: number = 1) {
@@ -173,35 +177,39 @@ const KISSMANGA: SourceSettings = {
 
         async getSearchData(query: string, sourceData: SourceSettings) {
             const results: Manga[] = [];
-            const url = `https://kissmanga.org/Search/SearchSuggest?keyword=${encodeURIComponent(
-                query,
-            )}`;
-            const { body } = await gotScraping(url, {
-                method: "GET",
-                dnsCache: true,
-            });
-
-            const $ = load(body);
-
-            $(`a.item_search_link`).each((i, el) => {
-                const $$ = load(el);
-                const url = sourceData.url + $$(`a`).attr("href");
-                const slug = this.utils.getMangaSlug.bind(sourceData)(url);
-
-                results.push({
-                    url,
-                    slug: slug,
-                    title: $$(`a`).text()?.trim(),
-                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
-                        `https://kissmanga.org/mangaimage/${slug}.jpg`,
-                    )}&referer=${encodeURIComponent(url)}`,
-                    altTitles: [],
-                    genres: [],
-                    source: sourceData.source,
+            try {
+                const url = `https://kissmanga.org/Search/SearchSuggest?keyword=${encodeURIComponent(
+                    query,
+                )}`;
+                const { body } = await gotScraping(url, {
+                    method: "GET",
+                    dnsCache: true,
                 });
-            });
 
-            return results;
+                const $ = load(body);
+
+                $(`a.item_search_link`).each((i, el) => {
+                    const $$ = load(el);
+                    const url = sourceData.url + $$(`a`).attr("href");
+                    const slug = this.utils.getMangaSlug.bind(sourceData)(url);
+
+                    results.push({
+                        url,
+                        slug: slug,
+                        title: $$(`a`).text()?.trim(),
+                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                            `https://kissmanga.org/mangaimage/${slug}.jpg`,
+                        )}&referer=${encodeURIComponent(url)}`,
+                        altTitles: [],
+                        genres: [],
+                        source: sourceData.source,
+                    });
+                });
+
+                return results;
+            } catch {
+                return results;
+            }
         },
 
         getMangaCover(slug: string) {
@@ -319,38 +327,47 @@ const MANGAKAKALOT: SourceSettings = {
             query: string,
             sourceData: SourceSettings,
         ): Promise<Manga[]> {
-            const url = `https://manganato.com/getstorysearchjson`;
+            try {
+                const url = `https://manganato.com/getstorysearchjson`;
 
-            const { body } = await gotScraping(url, {
-                method: "POST",
-                dnsCache: true,
-                headers: {
-                    "content-type":
-                        "application/x-www-form-urlencoded; charset=UTF-8",
-                },
-                body: `searchword=${query.replace(/ /g, "_")}`,
-            });
+                const { body } = await gotScraping(url, {
+                    method: "POST",
+                    dnsCache: true,
+                    headers: {
+                        "content-type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body: `searchword=${query.replace(/ /g, "_")}`,
+                });
 
-            const { searchlist } = JSON.parse(body);
+                const { searchlist } = JSON.parse(body);
 
-            const results: Manga[] = searchlist.map((manga: any) => {
-                const mangaFormatted: Manga = {
-                    url: manga.url_story,
-                    altTitles: [],
-                    cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
-                        manga.image,
-                    )}&referer=${encodeURIComponent(manga.url_story)}`,
-                    genres: [],
-                    slug: this.utils.getMangaSlug.bind(sourceData)(
-                        manga.url_story,
-                    ),
-                    source: Sources.MANGAKAKALOT,
-                    title: manga.name,
-                };
-                return mangaFormatted;
-            });
+                const results: Manga[] = searchlist.map((manga: any) => {
+                    const mangaFormatted: Manga = {
+                        url: manga.url_story,
+                        altTitles: [],
+                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                            manga.image,
+                        )}&referer=${encodeURIComponent(manga.url_story)}`,
+                        genres: [],
+                        slug: this.utils.getMangaSlug.bind(sourceData)(
+                            manga.url_story,
+                        ),
+                        source: Sources.MANGAKAKALOT,
+                        title: manga.name
+                            .replace(
+                                `<span style="color: #FF530D;font-weight: bold;">`,
+                                "",
+                            )
+                            .replace("</span>"),
+                    };
+                    return mangaFormatted;
+                });
 
-            return results;
+                return results;
+            } catch {
+                return [];
+            }
         },
 
         getMangaUrl(slug: string, page: number = 1) {
@@ -429,9 +446,10 @@ export class CustomSourceService {
                 altTitles: [],
                 genres: [],
                 source: sourceData.source,
-                score: Number(
-                    $$(sourceData.selectors.mangaList.score).text()?.trim(),
-                ) * sourceData.config.scoreMultiplyBy,
+                score:
+                    Number(
+                        $$(sourceData.selectors.mangaList.score).text()?.trim(),
+                    ) * sourceData.config.scoreMultiplyBy,
                 chapters: [],
             };
 
@@ -468,7 +486,9 @@ export class CustomSourceService {
             releaseYear: Number(
                 $(sourceData.selectors.manga.releasedAt).text()?.trim(),
             ),
-            score: Number($(sourceData.selectors.manga.score).text()?.trim()) * sourceData.config.scoreMultiplyBy,
+            score:
+                Number($(sourceData.selectors.manga.score).text()?.trim()) *
+                sourceData.config.scoreMultiplyBy,
             status: $(sourceData.selectors.manga.status).text()?.trim(),
             type: $(sourceData.selectors.manga.type).text()?.trim(),
 
@@ -618,7 +638,7 @@ export interface SourceSettings {
         chapter?: string;
     };
     config: {
-        scoreMultiplyBy: number,
+        scoreMultiplyBy: number;
     };
     utils: {
         [index: string]: Function;
