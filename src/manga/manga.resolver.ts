@@ -15,8 +15,13 @@ export class MangaResolver {
     @Query(() => [Manga], { name: "search" })
     @CacheControl({ maxAge: 10, scope: "PUBLIC" })
     async search(@Args("searchInput") searchInput: MangaSearchInput) {
-        const searchResult = await this.mangaService.search(searchInput);
-        return searchResult
+        try {
+            const searchResult = await this.mangaService.search(searchInput);
+
+            return searchResult
+        } catch {
+            return []
+        }
     }
 
     @Query(() => Manga, { name: "manga" })
