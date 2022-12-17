@@ -16,11 +16,14 @@ export class MangaResolver {
     @CacheControl({ maxAge: 10, scope: "PUBLIC" })
     async search(@Args("searchInput") searchInput: MangaSearchInput) {
         try {
+            console.time("search-" + searchInput.source);
             const searchResult = await this.mangaService.search(searchInput);
+            console.timeEnd("search-" + searchInput.source);
 
-            return searchResult
-        } catch {
-            return []
+            return searchResult;
+        } catch (err) {
+            console.log(err);
+            return [];
         }
     }
 

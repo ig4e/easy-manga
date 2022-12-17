@@ -105,10 +105,8 @@ const SOURCES: SourcesSettings = {
             mangaList: {
                 ...DEFAULT_SOURCE_SETTINGS.selectors.mangaList,
                 url: "div.item-thumb.hover-details.c-image-hover > a",
-                
-            }   
+            },
         },
-
     },
 };
 
@@ -138,6 +136,7 @@ export class MadaraService {
                     body:
                         "action=wp-manga-search-manga&title=" +
                         encodeURIComponent(query),
+                    timeout: { response: 10 * 1000 },
                 },
             );
 
@@ -187,7 +186,9 @@ export class MadaraService {
             ).each((i, el) => {
                 const $$ = load(el);
                 const a = $$(SOURCE.selectors.mangaList.url);
-                const title = $$(`h3 > a:nth-child(2)`).text()?.trim() || $$(`h3 > a`).text()?.trim();
+                const title =
+                    $$(`h3 > a:nth-child(2)`).text()?.trim() ||
+                    $$(`h3 > a`).text()?.trim();
                 if (title.includes("Novel")) return;
                 const url = a.attr("href");
                 const slug = this.getMangaSlug(source, url);

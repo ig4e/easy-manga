@@ -133,6 +133,7 @@ export class MangaReaderService {
                     body:
                         "action=ts_ac_do_search&ts_ac_query=" +
                         encodeURIComponent(query),
+                    timeout: { response: 10 * 1000 },
                 },
             );
             const all = JSON.parse(body).series[0].all;

@@ -73,7 +73,7 @@ const TEAMX: SourceSettings = {
                 )}`;
                 const { body } = await gotScraping(url, {
                     method: "GET",
-                    dnsCache: true,
+                    timeout: { response: 10 * 1000 },
                 });
 
                 const $ = load(body);
@@ -183,7 +183,7 @@ const KISSMANGA: SourceSettings = {
                 )}`;
                 const { body } = await gotScraping(url, {
                     method: "GET",
-                    dnsCache: true,
+                    timeout: { response: 10 * 1000 },
                 });
 
                 const $ = load(body);
@@ -338,6 +338,7 @@ const MANGAKAKALOT: SourceSettings = {
                             "application/x-www-form-urlencoded; charset=UTF-8",
                     },
                     body: `searchword=${query.replace(/ /g, "_")}`,
+                    timeout: { response: 10 * 1000 },
                 });
 
                 const { searchlist } = JSON.parse(body);
