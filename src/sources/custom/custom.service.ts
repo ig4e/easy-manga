@@ -10,7 +10,7 @@ const UA =
 
 const TEAMX: SourceSettings = {
     source: Sources.TEAMX,
-    url: "https://mnhaestate.com",
+    url: "https://team1x1.fun",
     pathes: { manga: "/series" },
     config: {
         scoreMultiplyBy: 1,
@@ -360,7 +360,7 @@ const MANGAKAKALOT: SourceSettings = {
                                 `<span style="color: #FF530D;font-weight: bold;">`,
                                 "",
                             )
-                            .replace("</span>"),
+                            .replace("</span>", ""),
                     };
                     return mangaFormatted;
                 });
