@@ -136,7 +136,7 @@ export class MadaraService {
                     body:
                         "action=wp-manga-search-manga&title=" +
                         encodeURIComponent(query),
-                    timeout: { response: 10 * 1000 },
+                    timeout: { response: 5 * 1000 },
                 },
             );
 

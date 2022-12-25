@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { randomUUID } from "crypto";
 import { CustomSourceService } from "../sources/custom/custom.service";
 import { MadaraService, MadaraSources } from "../sources/madara/madara.service";
@@ -19,16 +19,25 @@ import { Manga } from "./entities/manga.entity";
 import Fuse from "fuse.js";
 import { ratio } from "fuzzball";
 import { MeiliService } from "../meili.service";
+import * as http from "http";
+import * as https from "https";
 
 @Injectable()
 export class MangaService {
+    axiosClient: AxiosInstance;
+
     constructor(
         private mangaReader: MangaReaderService,
         private madara: MadaraService,
         private customSource: CustomSourceService,
         private mangaDex: MangaDexService,
         private meili: MeiliService,
-    ) {}
+    ) {
+        this.axiosClient = axios.create({
+            httpAgent: new http.Agent({ keepAlive: true }),
+            httpsAgent: new https.Agent({ keepAlive: true }),
+        });
+    }
 
     async search(input: MangaSearchInput) {
         let { mangaReader, madara, custom } = SourcesType;
@@ -106,10 +115,12 @@ export class MangaService {
     }
 
     async addDexFieldsToArray(manga: Manga[]) {
+        //return manga;
         const mangaWithDexFields = await Promise.all(
             manga.map(async (manga) => {
                 if (!manga) return manga;
 
+                let atlasStartDate = Date.now();
                 const { data } = await axios({
                     method: "POST",
                     url: "https://data.mongodb-api.com/app/data-ykgku/endpoint/data/v1/action/aggregate",
@@ -161,6 +172,9 @@ export class MangaService {
                         ],
                     },
                 });
+                let atlasEndDate = Date.now();
+
+                console.log(`Atlas Time : ${atlasEndDate - atlasStartDate}ms`);
 
                 const fuse = new Fuse(data.documents, {
                     keys: ["title.en", "altTitles"],

@@ -73,7 +73,7 @@ const TEAMX: SourceSettings = {
                 )}`;
                 const { body } = await gotScraping(url, {
                     method: "GET",
-                    timeout: { response: 10 * 1000 },
+                    timeout: { response: 5 * 1000 },
                 });
 
                 const $ = load(body);
@@ -183,7 +183,7 @@ const KISSMANGA: SourceSettings = {
                 )}`;
                 const { body } = await gotScraping(url, {
                     method: "GET",
-                    timeout: { response: 10 * 1000 },
+                    timeout: { response: 5 * 1000 },
                 });
 
                 const $ = load(body);
