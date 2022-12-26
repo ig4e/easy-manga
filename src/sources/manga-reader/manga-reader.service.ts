@@ -63,7 +63,7 @@ const SOURCES: SourcesSettings = {
         ...DEFAULT_SOURCE_SETTINGS,
     },
     ARES: {
-        url: "https://aresmanga.com",
+        url: "https://aresmanga.net",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     OZULSCANS: {
