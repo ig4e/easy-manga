@@ -65,6 +65,7 @@ const SOURCES: SourcesSettings = {
     ARES: {
         url: "https://aresmanga.net",
         ...DEFAULT_SOURCE_SETTINGS,
+        pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/series" },
     },
     OZULSCANS: {
         url: "https://ozulscans.com",
@@ -169,7 +170,7 @@ export class MangaReaderService {
 
     async mangaList(
         source: MangaReaderSources,
-        mangaListOptions: MangaListFilters = {},
+        mangaListOptions: MangaListFilters = { page: 1 },
     ): Promise<Manga[]> {
         const SOURCE = SOURCES[source];
         const results: Manga[] = [];
@@ -220,6 +221,7 @@ export class MangaReaderService {
                 });
             });
         } else {
+            console.log(ok, statusCode, url);
             throw new UnprocessableEntityException(statusCode, statusMessage);
         }
 
