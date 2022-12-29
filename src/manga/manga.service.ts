@@ -12,6 +12,7 @@ import {
     MangalistInput,
     MangaSearchInput,
     MangaUniqueInput,
+    Order,
     Sources,
     SourcesType,
 } from "./dto/manga.input";
@@ -78,9 +79,21 @@ export class MangaService {
                 input.page,
             );
         } else if (custom.includes(input.source)) {
+           
+
+            let order: "top" | "new" | "latest" = "top";
+
+
+            if (input.filters.order === Order.LATEST) order = "new"
+            if (input.filters.order === Order.UPDATE) order = "latest"
+            if (input.filters.order === Order.POPULAR) order = "top"
+
+
+            //order: "top" | "new" | "latest"
             mangaArrResult = await this.customSource.mangaList(
                 input.source,
                 input.page,
+                order
             );
         }
 

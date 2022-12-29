@@ -355,12 +355,7 @@ const MANGAKAKALOT: SourceSettings = {
                             manga.url_story,
                         ),
                         source: Sources.MANGAKAKALOT,
-                        title: manga.name
-                            .replace(
-                                `<span style="color: #FF530D;font-weight: bold;">`,
-                                "",
-                            )
-                            .replace("</span>", ""),
+                        title: load(manga.name).text(),
                     };
                     return mangaFormatted;
                 });
@@ -380,9 +375,9 @@ const MANGAKAKALOT: SourceSettings = {
             return clearDupleSlashes(urlData.url + `/` + mangaSlug);
         },
 
-        getMangaListUrl(page: number = 1) {
+        getMangaListUrl(page: number = 1, order: "top" | "new" | "latest") {
             return clearDupleSlashes(
-                this.url + this.pathes.mangaList + `/${page}?type=topview`,
+                `https://manganato.com/genre-all` + `/${page}?type=${order === "top" ? "topview" : order === "new" ? "newest" : ""}`,
             );
         },
 
@@ -420,10 +415,10 @@ export class CustomSourceService {
         }
     }
 
-    async mangaList(source: Sources, page: number = 0) {
+    async mangaList(source: Sources, page: number = 0, order: "top" | "new" | "latest") {
         const result: Manga[] = [];
         const sourceData: SourceSettings = customSources[source];
-        const url = sourceData.utils.getMangaListUrl.bind(sourceData)(page);
+        const url = sourceData.utils.getMangaListUrl.bind(sourceData)(page, order);
         const { body } = await gotScraping(url, {
             cache: true,
             dnsCache: true,
@@ -451,7 +446,19 @@ export class CustomSourceService {
                     Number(
                         $$(sourceData.selectors.mangaList.score).text()?.trim(),
                     ) * sourceData.config.scoreMultiplyBy,
-                chapters: [],
+                chapters: [
+                    {
+                        name: $$(
+                            sourceData.selectors.mangaList.latestChapterName,
+                        ).text(),
+                        number: this.getChapterNumber(
+                            $$(
+                                sourceData.selectors.mangaList
+                                    .latestChapterName,
+                            ).text(),
+                        ),
+                    },
+                ],
             };
 
             result.push(manga);

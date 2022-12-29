@@ -52,7 +52,7 @@ export class SourcesDataController {
 
     @Get("/custom-source/list")
     async customSourceMangalist(@Query("page") page: string) {
-        return this.customSource.mangaList(Sources.TEAMX, Number(page));
+        return this.customSource.mangaList(Sources.TEAMX, Number(page), "top");
     }
 
     @Get("/custom-source/search")
