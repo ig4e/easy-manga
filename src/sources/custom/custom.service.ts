@@ -68,7 +68,7 @@ const TEAMX: SourceSettings = {
         async getSearchData(query: string, sourceData: SourceSettings) {
             try {
                 const results: Manga[] = [];
-                const url = `https://mnhaestate.com/ajax/search?keyword=${encodeURIComponent(
+                const url = `https://team1x1.fun/ajax/search?keyword=${encodeURIComponent(
                     query,
                 )}`;
                 const { body } = await gotScraping(url, {

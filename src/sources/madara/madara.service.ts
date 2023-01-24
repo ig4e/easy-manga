@@ -65,7 +65,7 @@ const SOURCES: SourcesSettings = {
         ...DEFAULT_SOURCE_SETTINGS,
     },
     AZORA: {
-        url: "https://azoraworlds.net",
+        url: "https://azoranov.com",
         ...DEFAULT_SOURCE_SETTINGS,
         pathes: {
             manga: "/series",
