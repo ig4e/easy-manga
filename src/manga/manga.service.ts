@@ -128,7 +128,7 @@ export class MangaService {
     }
 
     async addDexFieldsToArray(manga: Manga[]) {
-        //return manga;
+        return manga;
         const mangaWithDexFields = await Promise.all(
             manga.map(async (manga) => {
                 if (!manga) return manga;
