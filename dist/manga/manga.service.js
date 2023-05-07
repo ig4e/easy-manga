@@ -115,6 +115,7 @@ let MangaService = class MangaService {
         return withDex[0];
     }
     async addDexFieldsToArray(manga) {
+        return manga;
         const mangaWithDexFields = await Promise.all(manga.map(async (manga) => {
             var _a, _b;
             if (!manga)

@@ -73,7 +73,7 @@ const TEAMX = {
         async getSearchData(query, sourceData) {
             try {
                 const results = [];
-                const url = `https://mnhaestate.com/ajax/search?keyword=${encodeURIComponent(query)}`;
+                const url = `https://team1x1.fun/ajax/search?keyword=${encodeURIComponent(query)}`;
                 const { body } = await (0, got_scraping_1.gotScraping)(url, {
                     method: "GET",
                     timeout: { response: 5 * 1000 },

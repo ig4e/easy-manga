@@ -12,18 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 let AppController = class AppController {
-    ok() {
+    root() {
         return 200;
     }
 };
 __decorate([
-    (0, common_1.Get)("/"),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], AppController.prototype, "ok", null);
+], AppController.prototype, "root", null);
 AppController = __decorate([
-    (0, common_1.Controller)("app")
+    (0, common_1.Controller)("")
 ], AppController);
 exports.AppController = AppController;
 //# sourceMappingURL=app.controller.js.map

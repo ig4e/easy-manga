@@ -1,3 +1,3 @@
 export declare class AppController {
-    ok(): number;
+    root(): number;
 }

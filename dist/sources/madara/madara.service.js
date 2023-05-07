@@ -66,7 +66,7 @@ const DEFAULT_SOURCE_SETTINGS = {
 };
 const SOURCES = {
     MANGALEK: Object.assign({ url: "https://mangalek.com" }, DEFAULT_SOURCE_SETTINGS),
-    AZORA: Object.assign(Object.assign({ url: "https://azoraworlds.net" }, DEFAULT_SOURCE_SETTINGS), { pathes: {
+    AZORA: Object.assign(Object.assign({ url: "https://azoranov.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: {
             manga: "/series",
         } }),
     MANGASPARK: Object.assign({ url: "https://mangaspark.com" }, DEFAULT_SOURCE_SETTINGS),
