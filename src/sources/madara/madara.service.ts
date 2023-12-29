@@ -61,18 +61,18 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
 
 const SOURCES: SourcesSettings = {
     MANGALEK: {
-        url: "https://mangalek.com",
+        url: "https://manga-lek.net",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     AZORA: {
-        url: "https://azoranov.com",
+        url: "https://azoramoon.com",
         ...DEFAULT_SOURCE_SETTINGS,
         pathes: {
             manga: "/series",
         },
     },
     MANGASPARK: {
-        url: "https://mangaspark.com",
+        url: "https://manga-lek.net",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     STKISSMANGA: {

@@ -63,17 +63,20 @@ const SOURCES: SourcesSettings = {
         ...DEFAULT_SOURCE_SETTINGS,
     },
     ARES: {
-        url: "https://aresmanga.net",
+        url: "https://aresnov.org",
         ...DEFAULT_SOURCE_SETTINGS,
         pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/series" },
     },
     OZULSCANS: {
-        url: "https://ozulscans.com",
+        url: "https://kingofmanga.com",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     GALAXYMANGA: {
-        url: "https://galaxymanga.org",
+        url: "https://flixscans.com/",
         ...DEFAULT_SOURCE_SETTINGS,
+        pathes: {
+            ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/series"
+        },
         selectors: {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
             manga: {
@@ -83,7 +86,7 @@ const SOURCES: SourcesSettings = {
         },
     },
     MANGASWAT: {
-        url: "https://swatmanga.me",
+        url: "https://goldragon.me",
         pathes: { ...DEFAULT_SOURCE_SETTINGS.pathes, manga: "/manga" },
         selectors: {
             ...DEFAULT_SOURCE_SETTINGS.selectors,
