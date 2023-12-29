@@ -335,7 +335,7 @@ export class MangaReaderService {
     }
 
     genereateImageUrl(url: string, referer: string) {
-        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+        return `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(
             url,
         )}&referer=${encodeURIComponent(referer)}`;
     }

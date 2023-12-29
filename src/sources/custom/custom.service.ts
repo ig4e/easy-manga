@@ -85,7 +85,7 @@ const TEAMX: SourceSettings = {
                         url,
                         slug: this.utils.getMangaSlug.bind(sourceData)(url),
                         title: $$(`a`).text()?.trim(),
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(
                             $$("a > img").attr("src"),
                         )}&referer=${encodeURIComponent(url)}`,
                         altTitles: [],
@@ -197,7 +197,7 @@ const KISSMANGA: SourceSettings = {
                         url,
                         slug: slug,
                         title: $$(`a`).text()?.trim(),
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(
                             `https://kissmanga.org/mangaimage/${slug}.jpg`,
                         )}&referer=${encodeURIComponent(url)}`,
                         altTitles: [],
@@ -347,7 +347,7 @@ const MANGAKAKALOT: SourceSettings = {
                     const mangaFormatted: Manga = {
                         url: manga.url_story,
                         altTitles: [],
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(
                             manga.image,
                         )}&referer=${encodeURIComponent(manga.url_story)}`,
                         genres: [],
@@ -631,7 +631,7 @@ export class CustomSourceService {
     }
 
     genereateImageUrl(url: string, referer: string) {
-        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(
+        return `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(
             url,
         )}&referer=${encodeURIComponent(referer)}`;
     }
