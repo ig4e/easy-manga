@@ -244,6 +244,7 @@ const mangakalotUrls = [
     { url: "https://readmanganato.com", urlSlug: "readmanganato" },
     { url: "https://manganato.com", urlSlug: "manganato" },
     { url: "https://chapmanganato.com", urlSlug: "chapmanganato" },
+    { url: "https:/chapmanganato.to",  urlSlug: "chapmanganato-to"}
     { url: "https://mangakakalot.com", urlSlug: "mangakakalot" },
 ];
 
