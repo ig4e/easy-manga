@@ -61,7 +61,7 @@ const DEFAULT_SOURCE_SETTINGS: SourceSettings = {
 
 const SOURCES: SourcesSettings = {
     MANGALEK: {
-        url: "https://manga-lek.net",
+        url: "https://like-manga.net",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     AZORA: {
@@ -72,7 +72,7 @@ const SOURCES: SourcesSettings = {
         },
     },
     MANGASPARK: {
-        url: "https://manga-lek.net",
+        url: "https://like-manga.net",
         ...DEFAULT_SOURCE_SETTINGS,
     },
     STKISSMANGA: {
