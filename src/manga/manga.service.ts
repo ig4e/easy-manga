@@ -41,7 +41,7 @@ export class MangaService {
     }
 
     async search(input: MangaSearchInput) {
-        let { mangaReader, madara, custom } = SourcesType;
+        const { mangaReader, madara, custom } = SourcesType;
         let mangaArrResult: Manga[];
 
         if (mangaReader.includes(input.source)) {
@@ -65,7 +65,7 @@ export class MangaService {
     }
 
     async mangaList(input: MangalistInput = { page: 1, source: Sources.ARES }) {
-        let { mangaReader, madara, custom } = SourcesType;
+        const { mangaReader, madara, custom } = SourcesType;
         let mangaArrResult: Manga[];
 
         if (mangaReader.includes(input.source)) {
@@ -95,30 +95,32 @@ export class MangaService {
                 input.page,
                 order
             );
+
+            
         }
 
         return await this.addDexFieldsToArray(mangaArrResult);
     }
 
     async manga(input: MangaUniqueInput) {
-        let { mangaReader, madara, custom } = SourcesType;
+        const { mangaReader, madara, custom } = SourcesType;
         let resultManga: Manga;
 
         if (mangaReader.includes(input.source)) {
-            let manga = await this.mangaReader.manga(
+            const manga = await this.mangaReader.manga(
                 input.source as MangaReaderSources,
                 input.slug,
             );
             if (!manga) throw new NotFoundException();
             resultManga = manga;
         } else if (madara.includes(input.source)) {
-            let manga = await this.madara.manga(
+            const manga = await this.madara.manga(
                 input.source as MadaraSources,
                 input.slug,
             );
             resultManga = manga;
         } else if (custom.includes(input.source)) {
-            let manga = await this.customSource.manga(input.source, input.slug);
+            const manga = await this.customSource.manga(input.source, input.slug);
             resultManga = manga;
         }
 
@@ -133,97 +135,75 @@ export class MangaService {
             manga.map(async (manga) => {
                 if (!manga) return manga;
 
-                let atlasStartDate = Date.now();
-                const { data } = await axios({
-                    method: "POST",
-                    url: "https://data.mongodb-api.com/app/data-ykgku/endpoint/data/v1/action/aggregate",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Access-Control-Request-Headers": "*",
-                        "api-key":
-                            "6kCvNRcJ63IfZ0fyNSNjXn7J1PXy7NLYYx4ovzrfV57V0BSLR8EGotFyuUOXWrm3",
-                    },
-                    data: {
-                        dataSource: "Cluster0",
-                        database: "prod",
-                        collection: "Manga",
-                        pipeline: [
-                            {
-                                $search: {
-                                    index: "default",
-                                    compound: {
-                                        should: [
-                                            {
-                                                text: {
-                                                    query: manga.title,
-                                                    path: "title.en",
-                                                    score: {
-                                                        boost: {
-                                                            value: 2,
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                            {
-                                                text: {
-                                                    query: manga.title,
-                                                    path: "altTitles",
-                                                    score: {
-                                                        boost: {
-                                                            value: 1.5,
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                            {
-                                $limit: 16,
-                            },
-                        ],
-                    },
-                });
-                let atlasEndDate = Date.now();
+                try {
+                    const dexStartDate = Date.now();
+                    const dexMangaData = await this.mangaDex.search(manga.title);
+                    const dexEndDate = Date.now();
 
-                console.log(`Atlas Time : ${atlasEndDate - atlasStartDate}ms`);
+                    console.log(`MangaDex Time : ${dexEndDate - dexStartDate}ms`);
 
-                const fuse = new Fuse(data.documents, {
-                    keys: ["title.en", "altTitles"],
-                });
+                    if (!dexMangaData) return manga;
 
-                const fuseResult = fuse.search(manga.title);
+                    // Extract data from MangaDex API response structure
+                    const attributes = dexMangaData.attributes || {};
+                    const links = attributes.links || {};
 
-                const dexMangaData = fuseResult?.[0]?.item as any;
+                    // Extract cover art from relationships
+                    const coverArts = dexMangaData.relationships?.filter(
+                        (rel: any) => rel.type === 'cover_art'
+                    ) || [];
 
-                if (!dexMangaData) return manga;
-
-                const neededInfo = {
-                    dexId: dexMangaData?.dexId,
-                    aniId: dexMangaData?.links.al,
-                    muId: dexMangaData?.links.mu,
-                    cover: this.mangaReader.genereateImageUrl(
-                        `https://mangadex.org/covers/${dexMangaData.dexId}/${
-                            dexMangaData?.covers?.[
-                                dexMangaData?.covers.length - 1
-                            ].fileName
-                        }`,
-                        "https://mangadex.org/",
-                    ),
-                    covers: dexMangaData.covers.map((cover) => {
-                        return {
+                    // Sanitize and create clean copies of all data to avoid circular references
+                    const neededInfo = {
+                        dexId: dexMangaData.id,
+                        aniId: links.al,
+                        muId: links.mu,
+                        cover: coverArts.length > 0 ? this.mangaReader.genereateImageUrl(
+                            `https://mangadex.org/covers/${dexMangaData.id}/${coverArts[0].attributes?.fileName}`,
+                            "https://mangadex.org/",
+                        ) : undefined,
+                        covers: coverArts.map((cover: any) => ({
                             url: this.mangaReader.genereateImageUrl(
-                                `https://mangadex.org/covers/${dexMangaData.dexId}/${cover.fileName}`,
+                                `https://mangadex.org/covers/${dexMangaData.id}/${cover.attributes?.fileName}`,
                                 "https://mangadex.org/",
                             ),
-                            volume: cover.volume,
-                        };
-                    }),
-                    altTitles: dexMangaData.altTitles,
-                };
+                            volume: cover.attributes?.volume || "",
+                        })),
+                        altTitles: Array.isArray(attributes.altTitles)
+                            ? attributes.altTitles.flatMap((titleObj: any) =>
+                                typeof titleObj === 'object' ? Object.values(titleObj) : [titleObj]
+                              ).filter((title: any) => typeof title === 'string')
+                            : [],
+                    };
 
-                return { ...manga, ...neededInfo };
+                    // Create a clean copy of the manga object to avoid any potential circular references
+                    const cleanManga = {
+                        dexId: neededInfo.dexId,
+                        aniId: neededInfo.aniId,
+                        muId: neededInfo.muId,
+                        slug: manga.slug,
+                        url: manga.url,
+                        cover: neededInfo.cover || manga.cover,
+                        covers: neededInfo.covers,
+                        title: manga.title,
+                        altTitles: neededInfo.altTitles,
+                        genres: manga.genres || [],
+                        synopsis: manga.synopsis,
+                        status: manga.status,
+                        type: manga.type,
+                        author: manga.author,
+                        artist: manga.artist,
+                        releaseYear: manga.releaseYear,
+                        score: manga.score,
+                        chapters: manga.chapters,
+                        source: manga.source,
+                    };
+
+                    return cleanManga;
+                } catch (error) {
+                    console.error("Error in addDexFieldsToArray:", error);
+                    return manga;
+                }
             }),
         );
 

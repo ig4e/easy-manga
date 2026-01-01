@@ -24,7 +24,7 @@ let MangaDexService = class MangaDexService {
     async search(query) {
         var _a, _b;
         try {
-            let { body } = await gotInstance(`https://api.mangadex.org/manga?limit=16&offset=0&includes[]=cover_art&includes[]=author&includes[]=artist&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica&title=${encodeURIComponent(query)}&order[relevance]=desc`, { responseType: "json" });
+            const { body } = await gotInstance(`https://api.mangadex.org/manga?limit=16&offset=0&includes[]=cover_art&includes[]=author&includes[]=artist&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica&title=${encodeURIComponent(query)}&order[relevance]=desc`, { responseType: "json" });
             const fuse = new fuse_js_1.default(body.data, {
                 keys: [
                     "attributes.title.en",

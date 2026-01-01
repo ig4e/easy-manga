@@ -89,11 +89,11 @@ const DEFAULT_SOURCE_SETTINGS = {
 };
 const SOURCES = {
     ARENASCANS: Object.assign({ url: "https://arenascans.net" }, DEFAULT_SOURCE_SETTINGS),
-    ARES: Object.assign(Object.assign({ url: "https://aresmanga.net" }, DEFAULT_SOURCE_SETTINGS), { pathes: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.pathes), { manga: "/series" }) }),
-    OZULSCANS: Object.assign({ url: "https://ozulscans.com" }, DEFAULT_SOURCE_SETTINGS),
-    GALAXYMANGA: Object.assign(Object.assign({ url: "https://galaxymanga.org" }, DEFAULT_SOURCE_SETTINGS), { selectors: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors), { manga: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors.manga), { synopsis: `div.entry-content.entry-content-single > blockquote > p` }) }) }),
+    ARES: Object.assign(Object.assign({ url: "https://manhuascarlet.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.pathes), { manga: "/series" }) }),
+    OZULSCANS: Object.assign({ url: "https://king-ofmanga.com" }, DEFAULT_SOURCE_SETTINGS),
+    GALAXYMANGA: Object.assign(Object.assign({ url: "https://flixscans.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.pathes), { manga: "/series" }), selectors: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors), { manga: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors.manga), { synopsis: `div.entry-content.entry-content-single > blockquote > p` }) }) }),
     MANGASWAT: {
-        url: "https://swatmanga.me",
+        url: "https://swatmanhua.com",
         pathes: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.pathes), { manga: "/manga" }),
         selectors: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors), { manga: {
                 title: "div.infox > h1",
@@ -297,7 +297,7 @@ let MangaReaderService = class MangaReaderService {
         }
     }
     genereateImageUrl(url, referer) {
-        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
+        return `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
     }
     async getSoruceGenres(source) {
         const SOURCE = SOURCES[source];

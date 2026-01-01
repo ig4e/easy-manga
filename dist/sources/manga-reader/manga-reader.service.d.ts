@@ -3,7 +3,7 @@ import { Manga } from "src/manga/entities/manga.entity";
 import { Chapter } from "src/chapters/entities/chapter.entity";
 import { MangaListFilters } from "src/manga/dto/manga.input";
 import { Genre } from "src/genres/entities/genre.entity";
-export declare type MangaReaderSources = "ARES" | "GALAXYMANGA" | "MANGASWAT" | "OZULSCANS" | "ARENASCANS";
+export type MangaReaderSources = "ARES" | "GALAXYMANGA" | "MANGASWAT" | "OZULSCANS" | "ARENASCANS";
 export declare class MangaReaderService {
     constructor();
     search(source: MangaReaderSources, query: string): Promise<Manga[]>;

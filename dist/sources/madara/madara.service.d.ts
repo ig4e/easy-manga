@@ -2,7 +2,7 @@ import { OptionsOfTextResponseBody } from "got-scraping";
 import { Manga } from "src/manga/entities/manga.entity";
 import { Chapter } from "src/chapters/entities/chapter.entity";
 import { Genre } from "src/genres/entities/genre.entity";
-export declare type MadaraSources = "MANGALEK" | "MANGASPARK" | "AZORA" | "STKISSMANGA" | "MANGAPROTM" | "ASHQ";
+export type MadaraSources = "MANGALEK" | "MANGASPARK" | "AZORA" | "STKISSMANGA" | "MANGAPROTM" | "ASHQ";
 export declare class MadaraService {
     constructor();
     search(source: MadaraSources, query: string): Promise<Manga[]>;

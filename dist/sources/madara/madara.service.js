@@ -65,11 +65,11 @@ const DEFAULT_SOURCE_SETTINGS = {
     },
 };
 const SOURCES = {
-    MANGALEK: Object.assign({ url: "https://mangalek.com" }, DEFAULT_SOURCE_SETTINGS),
-    AZORA: Object.assign(Object.assign({ url: "https://azoranov.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: {
+    MANGALEK: Object.assign({ url: "https://like-manga.net" }, DEFAULT_SOURCE_SETTINGS),
+    AZORA: Object.assign(Object.assign({ url: "https://azoramoon.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: {
             manga: "/series",
         } }),
-    MANGASPARK: Object.assign({ url: "https://mangaspark.com" }, DEFAULT_SOURCE_SETTINGS),
+    MANGASPARK: Object.assign({ url: "https://like-manga.net" }, DEFAULT_SOURCE_SETTINGS),
     STKISSMANGA: Object.assign(Object.assign({ url: "https://1stkissmanga.io" }, DEFAULT_SOURCE_SETTINGS), { selectors: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors), { manga: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors.manga), { coverAttr: "data-lazy-src" }), mangaList: Object.assign(Object.assign({}, DEFAULT_SOURCE_SETTINGS.selectors.mangaList), { coverAttr: "data-lazy-src" }) }) }),
     MANGAPROTM: Object.assign(Object.assign({ url: "https://mangaprotm.com" }, DEFAULT_SOURCE_SETTINGS), { pathes: {
             manga: "/series",
@@ -275,7 +275,7 @@ let MadaraService = class MadaraService {
         }
     }
     genereateImageUrl(url, referer) {
-        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
+        return `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
     }
     async getSoruceGenres(source) {
         const SOURCE = SOURCES[source];

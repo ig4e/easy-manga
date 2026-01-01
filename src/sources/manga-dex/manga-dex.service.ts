@@ -14,7 +14,7 @@ const gotInstance = gotScraping.extend({
 export class MangaDexService {
     async search(query: string) {
         try {
-            let { body }: { body: any } = await gotInstance(
+            const { body }: { body: any } = await gotInstance(
                 `https://api.mangadex.org/manga?limit=16&offset=0&includes[]=cover_art&includes[]=author&includes[]=artist&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica&title=${encodeURIComponent(
                     query,
                 )}&order[relevance]=desc`,

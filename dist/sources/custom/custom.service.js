@@ -87,7 +87,7 @@ const TEAMX = {
                         url,
                         slug: this.utils.getMangaSlug.bind(sourceData)(url),
                         title: (_a = $$(`a`).text()) === null || _a === void 0 ? void 0 : _a.trim(),
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent($$("a > img").attr("src"))}&referer=${encodeURIComponent(url)}`,
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent($$("a > img").attr("src"))}&referer=${encodeURIComponent(url)}`,
                         altTitles: [],
                         genres: [],
                         source: sourceData.source,
@@ -184,7 +184,7 @@ const KISSMANGA = {
                         url,
                         slug: slug,
                         title: (_a = $$(`a`).text()) === null || _a === void 0 ? void 0 : _a.trim(),
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(`https://kissmanga.org/mangaimage/${slug}.jpg`)}&referer=${encodeURIComponent(url)}`,
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(`https://kissmanga.org/mangaimage/${slug}.jpg`)}&referer=${encodeURIComponent(url)}`,
                         altTitles: [],
                         genres: [],
                         source: sourceData.source,
@@ -211,15 +211,12 @@ const KISSMANGA = {
     },
 };
 const mangakalotUrls = [
-    { url: "https://readmanganato.com", urlSlug: "readmanganato" },
-    { url: "https://manganato.com", urlSlug: "manganato" },
-    { url: "https://chapmanganato.com", urlSlug: "chapmanganato" },
-    { url: "https://mangakakalot.com", urlSlug: "mangakakalot" },
+    { url: "https://www.mangakakalot.gg", urlSlug: "mangakakalot" },
 ];
 const MANGAKAKALOT = {
-    url: "https://manganato.com",
+    url: "https://www.mangakakalot.gg",
     pathes: {
-        mangaList: "/genre-all",
+        mangaList: "/genre/all",
         manga: "/",
     },
     config: {
@@ -227,40 +224,40 @@ const MANGAKAKALOT = {
     },
     selectors: {
         mangaList: {
-            list: "div.panel-content-genres > div.content-genres-item",
-            url: "a",
-            cover: "a > img",
-            score: "a > em.genres-item-rate",
-            title: "div > h3 > a",
-            latestChapterName: "div > a.genres-item-chap.text-nowrap.a-h",
+            list: "div.list-comic-item-wrap",
+            url: "a.list-story-item",
+            cover: "a.list-story-item > img",
+            score: "",
+            title: "h3 > a",
+            latestChapterName: "a.list-story-item-wrap-chapter",
             dropdown: { genre: "" },
         },
         manga: {
-            title: "div.panel-story-info > div.story-info-right > h1",
-            altTitles: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(1) > td.table-value > h2",
-            artist: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
-            author: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
-            cover: "div.panel-story-info > div.story-info-left > span.info-image > img",
-            genre: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(4) > td.table-value > a",
+            title: "ul.manga-info-text li h1",
+            altTitles: "h2.story-alternative",
+            artist: "li:contains('Author(s)')",
+            author: "li:contains('Author(s)')",
+            cover: "div.manga-info-pic img",
+            genre: "li.genres a",
             releasedAt: "",
-            score: "#rate_row_cmd > em > em:nth-child(2) > em > em:nth-child(1)",
-            status: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(3) > td.table-value",
-            synopsis: "#panel-story-info-description",
+            score: "#rate_row_cmd em",
+            status: "li:contains('Status :')",
+            synopsis: "div.description p",
             type: "",
             chapter: {
-                list: "div.container.container-main > div.container-main-left > div.panel-story-chapter-list > ul > li > a",
-                name: "a",
-                number: "a",
-                url: "a",
+                list: "div.chapter-list div.row a",
+                name: "",
+                number: "",
+                url: "",
             },
         },
         chapter: {
             page: "div.container-chapter-reader > img",
-            mangaUrl: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(3)",
-            name: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
-            next: "a.navi-change-chapter-btn-next.a-h",
-            prev: "a.navi-change-chapter-btn-prev.a-h",
-            number: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
+            mangaUrl: "div.breadcrumb.breadcrumbs a:nth-child(3)",
+            name: "select.navi-change-chapter option[selected]",
+            next: "div.btn-navigation-chap a.back",
+            prev: "div.btn-navigation-chap a.next",
+            number: "select.navi-change-chapter option[selected]",
         },
     },
     utils: {
@@ -286,22 +283,18 @@ const MANGAKAKALOT = {
         },
         async getSearchData(query, sourceData) {
             try {
-                const url = `https://manganato.com/getstorysearchjson`;
+                const url = `
+https://www.mangakakalot.gg/home/search/json?searchword=${query.replace(/ /g, "_")}`;
                 const { body } = await (0, got_scraping_1.gotScraping)(url, {
-                    method: "POST",
-                    dnsCache: true,
-                    headers: {
-                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-                    },
-                    body: `searchword=${query.replace(/ /g, "_")}`,
-                    timeout: { response: 10 * 1000 },
+                    method: "GET",
+                    timeout: { response: 5 * 1000 },
                 });
                 const { searchlist } = JSON.parse(body);
                 const results = searchlist.map((manga) => {
                     const mangaFormatted = {
                         url: manga.url_story,
                         altTitles: [],
-                        cover: `https://workers.emanga.tk/fetch?url=${encodeURIComponent(manga.image)}&referer=${encodeURIComponent(manga.url_story)}`,
+                        cover: `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(manga.image)}&referer=${encodeURIComponent(manga.url_story)}`,
                         genres: [],
                         slug: this.utils.getMangaSlug.bind(sourceData)(manga.url_story),
                         source: manga_input_1.Sources.MANGAKAKALOT,
@@ -315,13 +308,13 @@ const MANGAKAKALOT = {
                 return [];
             }
         },
-        getMangaUrl(slug, page = 1) {
+        getMangaUrl(slug, _page = 1) {
             const [urlSlug, mangaSlug] = slug.split("[]");
             const urlData = mangakalotUrls.find((url) => url.urlSlug === urlSlug);
-            return clearDupleSlashes(urlData.url + `/` + mangaSlug);
+            return clearDupleSlashes(urlData.url + `/manga/` + mangaSlug);
         },
         getMangaListUrl(page = 1, order) {
-            return clearDupleSlashes(`https://manganato.com/genre-all` + `/${page}?type=${order === "top" ? "topview" : order === "new" ? "newest" : ""}`);
+            return clearDupleSlashes(`https://www.mangakakalot.gg/genre/all` + `/?page=${page}&type=${order === "top" ? "topview" : order === "new" ? "newest" : ""}`);
         },
         getChapterUrl(slug) {
             const [urlSlug, chapterSlug] = slug.split("[]");
@@ -347,7 +340,7 @@ let CustomSourceService = class CustomSourceService {
             return [];
         }
     }
-    async mangaList(source, page = 0, order) {
+    async mangaList(source, page = 1, order) {
         const result = [];
         const sourceData = customSources[source];
         const url = sourceData.utils.getMangaListUrl.bind(sourceData)(page, order);
@@ -441,15 +434,13 @@ let CustomSourceService = class CustomSourceService {
         return mangaDetails;
         function getChapters($) {
             $(sourceData.selectors.manga.chapter.list).each((i, el) => {
-                var _a, _b, _c, _d;
-                const $$ = (0, slim_1.load)(el);
-                const url = $$(sourceData.selectors.manga.chapter.url).attr("href");
+                var _a;
+                const url = $(el).attr("href");
+                const name = $(el).attr("title") || ((_a = $(el).text()) === null || _a === void 0 ? void 0 : _a.trim());
                 mangaDetails.chapters.push({
                     slug: sourceData.utils.getChapterSlug.bind(sourceData)(url),
-                    name: (_c = (_b = (_a = $$(sourceData.selectors.manga.chapter.name)
-                        .text()) === null || _a === void 0 ? void 0 : _a.trim()) === null || _b === void 0 ? void 0 : _b.split(" ")) === null || _c === void 0 ? void 0 : _c.map((x) => x.trim()).join(" "),
-                    number: getChapterNumber((_d = $$(sourceData.selectors.manga.chapter.number)
-                        .text()) === null || _d === void 0 ? void 0 : _d.trim()),
+                    name,
+                    number: getChapterNumber(name),
                     mangaSlug: mangaDetails.slug,
                     url,
                     source: manga_input_1.Sources[source],
@@ -459,8 +450,10 @@ let CustomSourceService = class CustomSourceService {
     }
     async chapter(source, slug) {
         var _a, _b;
+        console.log('CHAPTER FUNCTION CALLED with source:', source, 'slug:', slug);
         const sourceData = customSources[source];
         const url = sourceData.utils.getChapterUrl.bind(sourceData)(slug);
+        console.log('Generated chapter URL:', url);
         const { body } = await (0, got_scraping_1.gotScraping)(url, {
             cache: true,
             dnsCache: true,
@@ -492,7 +485,7 @@ let CustomSourceService = class CustomSourceService {
         return (Number((_b = (_a = name.match(/[0-9]+(\.[0-9])?/g)) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.replace(/(\_|\-)/g, ".")) || 0);
     }
     genereateImageUrl(url, referer) {
-        return `https://workers.emanga.tk/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
+        return `https://easymangaproxy.sekai966.workers.dev/fetch?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
     }
 };
 CustomSourceService = __decorate([

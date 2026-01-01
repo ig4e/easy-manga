@@ -255,42 +255,40 @@ const MANGAKAKALOT: SourceSettings = {
     },
     selectors: {
         mangaList: {
-            list: "div.panel-content-genres > div.content-genres-item",
-            url: "a",
-            cover: "a > img",
-            score: "a > em.genres-item-rate",
-            title: "div > h3 > a",
-            latestChapterName: "div > a.genres-item-chap.text-nowrap.a-h",
+            list: "div.list-comic-item-wrap",
+            url: "a.list-story-item",
+            cover: "a.list-story-item > img",
+            score: "",
+            title: "h3 > a",
+            latestChapterName: "a.list-story-item-wrap-chapter",
             dropdown: { genre: "" },
         },
         manga: {
-            title: "div.panel-story-info > div.story-info-right > h1",
-            altTitles:
-                "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(1) > td.table-value > h2",
-            artist: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
-            author: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(2) > td.table-value > a",
-            cover: "div.panel-story-info > div.story-info-left > span.info-image > img",
-            genre: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(4) > td.table-value > a",
+            title: "ul.manga-info-text li h1",
+            altTitles: "h2.story-alternative",
+            artist: "li:contains('Author(s)')",
+            author: "li:contains('Author(s)')",
+            cover: "div.manga-info-pic img",
+            genre: "li.genres a",
             releasedAt: "",
-            score: "#rate_row_cmd > em > em:nth-child(2) > em > em:nth-child(1)",
-            status: "div.panel-story-info > div.story-info-right > table > tbody > tr:nth-child(3) > td.table-value",
-            synopsis: "#panel-story-info-description",
+            score: "#rate_row_cmd em",
+            status: "li:contains('Status :')",
+            synopsis: "div.description p",
             type: "",
             chapter: {
-                list: "div.container.container-main > div.container-main-left > div.panel-story-chapter-list > ul > li > a",
-                name: "a",
-                number: "a",
-                url: "a",
+                list: "div.chapter-list div.row span a",
+                name: "",
+                number: "",
+                url: "",
             },
         },
         chapter: {
             page: "div.container-chapter-reader > img",
-            mangaUrl:
-                "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(3)",
-            name: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
-            next: "a.navi-change-chapter-btn-next.a-h",
-            prev: "a.navi-change-chapter-btn-prev.a-h",
-            number: "body > div.body-site > div:nth-child(1) > div.panel-breadcrumb > a:nth-child(5)",
+            mangaUrl: "div.breadcrumb.breadcrumbs a:nth-child(3)",
+            name: "select.navi-change-chapter option[selected]",
+            next: "div.btn-navigation-chap a.back",
+            prev: "div.btn-navigation-chap a.next",
+            number: "select.navi-change-chapter option[selected]",
         },
     },
     utils: {
@@ -325,17 +323,11 @@ const MANGAKAKALOT: SourceSettings = {
             sourceData: SourceSettings,
         ): Promise<Manga[]> {
             try {
-                const url = `https://manganato.com/getstorysearchjson`;
-
+                const url = `
+https://www.mangakakalot.gg/home/search/json?searchword=${query.replace(/ /g, "_")}`;
                 const { body } = await gotScraping(url, {
-                    method: "POST",
-                    dnsCache: true,
-                    headers: {
-                        "content-type":
-                            "application/x-www-form-urlencoded; charset=UTF-8",
-                    },
-                    body: `searchword=${query.replace(/ /g, "_")}`,
-                    timeout: { response: 10 * 1000 },
+                    method: "GET",
+                    timeout: { response: 5 * 1000 },
                 });
 
                 const { searchlist } = JSON.parse(body);
@@ -363,7 +355,7 @@ const MANGAKAKALOT: SourceSettings = {
             }
         },
 
-        getMangaUrl(slug: string, page: number = 1) {
+        getMangaUrl(slug: string, _page: number = 1) {
             const [urlSlug, mangaSlug] = slug.split("[]");
             const urlData = mangakalotUrls.find(
                 (url) => url.urlSlug === urlSlug,
@@ -372,9 +364,9 @@ const MANGAKAKALOT: SourceSettings = {
             return clearDupleSlashes(urlData.url + `/` + mangaSlug);
         },
 
-        getMangaListUrl(page: number = 1, order: "top" | "new" | "latest") {
+        getMangaListUrl(page = 1, order: "top" | "new" | "latest") {
             return clearDupleSlashes(
-                `https://manganato.com/genre-all` + `/${page}?type=${order === "top" ? "topview" : order === "new" ? "newest" : ""}`,
+                `https://www.mangakakalot.gg/genre/all` + `/?page=${page}&type=${order === "top" ? "topview" : order === "new" ? "newest" : ""}`,
             );
         },
 
@@ -412,7 +404,7 @@ export class CustomSourceService {
         }
     }
 
-    async mangaList(source: Sources, page: number = 0, order: "top" | "new" | "latest") {
+    async mangaList(source: Sources, page = 1, order: "top" | "new" | "latest") {
         const result: Manga[] = [];
         const sourceData: SourceSettings = customSources[source];
         const url = sourceData.utils.getMangaListUrl.bind(sourceData)(page, order);
@@ -460,6 +452,7 @@ export class CustomSourceService {
 
             result.push(manga);
         });
+
 
         return result;
     }
@@ -543,24 +536,13 @@ export class CustomSourceService {
 
         function getChapters($: CheerioAPI) {
             $(sourceData.selectors.manga.chapter.list).each((i, el) => {
-                const $$ = load(el);
-                const url = $$(sourceData.selectors.manga.chapter.url).attr(
-                    "href",
-                );
+                const url = $(el).attr("href");
+                const name = $(el).attr("title") || $(el).text()?.trim();
 
                 mangaDetails.chapters.push({
                     slug: sourceData.utils.getChapterSlug.bind(sourceData)(url),
-                    name: $$(sourceData.selectors.manga.chapter.name)
-                        .text()
-                        ?.trim()
-                        ?.split(" ")
-                        ?.map((x) => x.trim())
-                        .join(" "),
-                    number: getChapterNumber(
-                        $$(sourceData.selectors.manga.chapter.number)
-                            .text()
-                            ?.trim(),
-                    ),
+                    name,
+                    number: getChapterNumber(name),
                     mangaSlug: mangaDetails.slug,
                     url,
                     source: Sources[source],
