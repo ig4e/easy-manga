@@ -241,17 +241,13 @@ const KISSMANGA: SourceSettings = {
 };
 
 const mangakalotUrls = [
-    { url: "https://readmanganato.com", urlSlug: "readmanganato" },
-    { url: "https://manganato.com", urlSlug: "manganato" },
-    { url: "https://chapmanganato.com", urlSlug: "chapmanganato" },
-    { url: "https://chapmanganato.to",  urlSlug: "chapmanganato-to"},
-    { url: "https://mangakakalot.com", urlSlug: "mangakakalot" },
+    { url: "https://www.mangakakalot.gg", urlSlug: "mangakakalot" },
 ];
 
 const MANGAKAKALOT: SourceSettings = {
-    url: "https://manganato.com",
+    url: "https://www.mangakakalot.gg",
     pathes: {
-        mangaList: "/genre-all",
+        mangaList: "/genre/all",
         manga: "/",
     },
     config: {
