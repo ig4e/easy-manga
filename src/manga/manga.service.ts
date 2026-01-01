@@ -84,9 +84,9 @@ export class MangaService {
             let order: "top" | "new" | "latest" = "top";
 
 
-            if (input.filters.order === Order.LATEST) order = "new"
-            if (input.filters.order === Order.UPDATE) order = "latest"
-            if (input.filters.order === Order.POPULAR) order = "top"
+            if (input?.filters?.order === Order.LATEST) order = "new"
+            if (input?.filters?.order === Order.UPDATE) order = "latest"
+            if (input?.filters?.order === Order.POPULAR) order = "top"
 
 
             //order: "top" | "new" | "latest"
